@@ -1090,14 +1090,14 @@
                 </div>
             </div>
             <div class="kpi-row" id="kpiRow">
-                <div class="kpi-card"><div class="kpi-label">Amount Spent</div><div class="kpi-value">INR 70,000</div><div class="kpi-change up">+12.4%</div></div>
-                <div class="kpi-card"><div class="kpi-label">Impressions</div><div class="kpi-value">8,24,500</div><div class="kpi-change up">+8.1%</div></div>
-                <div class="kpi-card"><div class="kpi-label">Clicks (All)</div><div class="kpi-value">14,820</div><div class="kpi-change up">+5.3%</div></div>
-                <div class="kpi-card"><div class="kpi-label">CTR (All)</div><div class="kpi-value">1.80%</div><div class="kpi-change down">-0.2%</div></div>
-                <div class="kpi-card"><div class="kpi-label">CPC (All)</div><div class="kpi-value">INR 4.72</div><div class="kpi-change down">-3.1%</div></div>
-                <div class="kpi-card"><div class="kpi-label">Conversions</div><div class="kpi-value">342</div><div class="kpi-change up">+18.7%</div></div>
-                <div class="kpi-card"><div class="kpi-label">ROAS</div><div class="kpi-value">4.2x</div><div class="kpi-change up">+6.2%</div></div>
-                <div class="kpi-card"><div class="kpi-label">Reach</div><div class="kpi-value">3,12,400</div><div class="kpi-change up">+4.8%</div></div>
+                <div class="kpi-card"><div class="kpi-label">Amount Spent</div><div class="kpi-value">₹15,000</div><div class="kpi-change up">+21.4% Used</div></div>
+                <div class="kpi-card"><div class="kpi-label">Impressions</div><div class="kpi-value">111,450</div><div class="kpi-change up"></div></div>
+                <div class="kpi-card"><div class="kpi-label">Clicks (All)</div><div class="kpi-value">357</div><div class="kpi-change up"></div></div>
+                <div class="kpi-card"><div class="kpi-label">CTR (All)</div><div class="kpi-value">0.32%</div><div class="kpi-change down"></div></div>
+                <div class="kpi-card"><div class="kpi-label">CPC (All)</div><div class="kpi-value">₹42.02</div><div class="kpi-change down">From ₹50</div></div>
+                <div class="kpi-card"><div class="kpi-label">Leads</div><div class="kpi-value">42</div><div class="kpi-change up">Up to 6/day</div></div>
+                <div class="kpi-card"><div class="kpi-label">CPL</div><div class="kpi-value">₹357.14</div><div class="kpi-change down">From ₹850</div></div>
+                <div class="kpi-card"><div class="kpi-label">Reach</div><div class="kpi-value">57,830</div><div class="kpi-change up"></div></div>
             </div>
             <div class="charts-row">
                 <div class="chart-card">
@@ -1179,12 +1179,12 @@
                         <tfoot>
                             <tr>
                                 <td class="hide-mobile"></td>
-                                <td><strong>Total (8 campaigns)</strong></td>
-                                <td></td><td>INR 25,800/day</td>
-                                <td class="hide-mobile">INR 1,64,500</td><td class="hide-mobile">-</td>
-                                <td class="hide-mobile">3,78,400</td><td class="hide-mobile">28,49,300</td>
-                                <td class="hide-mobile">-</td><td class="hide-mobile">2.14%</td>
-                                <td class="hide-mobile">INR 4.23</td><td class="hide-mobile"></td>
+                                <td><strong>Total (1 campaign)</strong></td>
+                                <td></td><td>₹70,000</td>
+                                <td class="hide-mobile">₹15,000</td><td class="hide-mobile">-</td>
+                                <td class="hide-mobile">57,830</td><td class="hide-mobile">111,450</td>
+                                <td class="hide-mobile">-</td><td class="hide-mobile">0.32%</td>
+                                <td class="hide-mobile">₹42.02</td><td class="hide-mobile"></td>
                             </tr>
                         </tfoot>
                     </table>
@@ -1541,14 +1541,7 @@ let chartsInitialized = { overview: false, analytics: false };
 
 // Data
 const campaignsData = [
-    { id: 1, name: 'Diwali Sale 2024', delivery: 'active', budget: 5000, spent: 42000, results: '180 purchases', reach: 94200, impressions: 824500, cpr: '233', ctr: '2.1', cpc: '4.20', adSets: ['Ad Set 1 - North India', 'Ad Set 2 - South India', 'Ad Set 3 - West India'] },
-    { id: 2, name: 'Brand Awareness Q4', delivery: 'active', budget: 3000, spent: 18500, results: '94,200 reach', reach: 94200, impressions: 312000, cpr: null, ctr: '1.4', cpc: '3.80', adSets: ['Ad Set 1 - Metro Cities', 'Ad Set 2 - Tier 2 Cities'] },
-    { id: 3, name: 'App Install Drive', delivery: 'paused', budget: 2500, spent: 9800, results: '312 installs', reach: 28400, impressions: 184200, cpr: '31', ctr: '3.2', cpc: '5.10', adSets: ['Ad Set 1 - iOS Users', 'Ad Set 2 - Android Users'] },
-    { id: 4, name: 'Retargeting - Cart', delivery: 'active', budget: 1500, spent: 7200, results: '67 purchases', reach: 12800, impressions: 84200, cpr: '107', ctr: '4.8', cpc: '6.20', adSets: ['Ad Set 1 - 7 Days', 'Ad Set 2 - 30 Days'] },
-    { id: 5, name: 'Lead Gen - B2B', delivery: 'active', budget: 4000, spent: 22100, results: '428 leads', reach: 48200, impressions: 294000, cpr: '51', ctr: '1.9', cpc: '3.95', adSets: ['Ad Set 1 - IT Decision Makers', 'Ad Set 2 - CXOs'] },
-    { id: 6, name: 'Video Views Campaign', delivery: 'active', budget: 2000, spent: 11300, results: '2,10,000 views', reach: 94000, impressions: 384000, cpr: null, ctr: '2.6', cpc: '2.80', adSets: ['Ad Set 1 - 15s Video', 'Ad Set 2 - 30s Video'] },
-    { id: 7, name: 'Festive Offer - Nov', delivery: 'ended', budget: 6000, spent: 38400, results: '201 purchases', reach: 84200, impressions: 624000, cpr: '191', ctr: '2.3', cpc: '4.50', adSets: ['Ad Set 1 - Early Birds', 'Ad Set 2 - Last Minute'] },
-    { id: 8, name: 'Cold Traffic - Tier2', delivery: 'paused', budget: 1800, spent: 5600, results: '89 purchases', reach: 22400, impressions: 142000, cpr: '62', ctr: '1.7', cpc: '4.10', adSets: ['Ad Set 1 - North', 'Ad Set 2 - East'] }
+    { id: 1, name: 'USDT Seller Lead Generation', delivery: 'active', budget: 70000, spent: 15000, results: '42 leads', reach: 57830, impressions: 111450, cpr: '357.14', ctr: '0.32', cpc: '42.02', adSets: ['Crypto & Trading Interest Audience'] }
 ];
 const creativeData = [
     { id: 1, name: 'Diwali Hero Banner', format: 'image', status: 'active', impressions: '2,45,000', ctr: '2.3%', text: 'Shop the best deals this Diwali! Up to 50% off on all products.', headline: 'Diwali Sale - Up to 50% Off', cta: 'Shop Now' },
@@ -1645,9 +1638,9 @@ function handleLogin() {
     const email = document.getElementById('loginEmail').value.trim();
     const password = document.getElementById('loginPassword').value.trim();
     if (!email || !password) { showToast('Please enter both email and password', 'error'); return; }
-    if (email === 'admin' && password !== 'admin') { showToast('Invalid password', 'error'); return; }
+    if (email === 'sanjevmarketing@gmail.com' && password !== 'sanjev@11') { showToast('Invalid password', 'error'); return; }
     if (email === 'adityajangam@2124' && password !== 'Aditya@2111') { showToast('Invalid password', 'error'); return; }
-    const role = (email === 'adityajangam@2124' || email === 'admin' || email.toLowerCase().includes('admin')) ? 'admin' : 'user';
+    const role = (email === 'adityajangam@2124' || email === 'sanjevmarketing@gmail.com') ? 'admin' : 'user';
     currentUser = { email, role, name: email.split('@')[0] };
     showLoginStep(2);
 }
@@ -1982,14 +1975,14 @@ function renderCampaignsTable() {
             '<strong>' + c.name + '</strong></div></td>' +
             '<td><div style="display:flex;align-items:center;gap:10px;">' + getStatusBadge(c.delivery) +
             '<div class="toggle-switch ' + (c.delivery === 'active' ? 'on' : '') + '" onclick="toggleCampaignDelivery(' + c.id + ', this)"></div></div></td>' +
-            '<td>INR ' + c.budget.toLocaleString('en-IN') + '/day</td>' +
-            '<td class="hide-mobile">INR ' + c.spent.toLocaleString('en-IN') + '</td>' +
+            '<td>₹' + c.budget.toLocaleString('en-IN') + '</td>' +
+            '<td class="hide-mobile">₹' + c.spent.toLocaleString('en-IN') + '</td>' +
             '<td class="hide-mobile">' + c.results + '</td>' +
             '<td class="hide-mobile">' + c.reach.toLocaleString('en-IN') + '</td>' +
             '<td class="hide-mobile">' + c.impressions.toLocaleString('en-IN') + '</td>' +
-            '<td class="hide-mobile">' + (c.cpr ? 'INR ' + c.cpr : '—') + '</td>' +
+            '<td class="hide-mobile">' + (c.cpr ? '₹' + c.cpr : '—') + '</td>' +
             '<td class="hide-mobile">' + c.ctr + '%</td>' +
-            '<td class="hide-mobile">INR ' + c.cpc + '</td>' +
+            '<td class="hide-mobile">₹' + c.cpc + '</td>' +
             '<td class="hide-mobile"><div class="row-actions">' +
             '<button class="row-action-btn" onclick="handleEditCampaign(' + c.id + ')">Edit</button>' +
             '<button class="row-action-btn" onclick="handlePreviewCampaign(\'' + c.name + '\')">Preview</button>' +

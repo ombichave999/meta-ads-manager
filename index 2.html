@@ -1,0 +1,3307 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meta Ads Manager</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+                :root {
+            --bg: #F5F5F7;
+            --sidebar-bg: rgba(255, 255, 255, 0.85);
+            --card-bg: #FFFFFF;
+            --border: rgba(0, 0, 0, 0.08);
+            --text-primary: #1D1D1F;
+            --text-secondary: #86868B;
+            --blue: #0071E3;
+            --blue-hover: #0077ED;
+            --active-nav-bg: rgba(0, 113, 227, 0.1);
+            --active-nav-text: #0071E3;
+            --green: #34C759;
+            --yellow: #FF9500;
+            --red: #FF3B30;
+            --topbar-bg: rgba(255, 255, 255, 0.85);
+            --input-border: rgba(0, 0, 0, 0.15);
+            --hover-row: rgba(0, 0, 0, 0.04);
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            --shadow-card: 0 8px 30px rgba(0, 0, 0, 0.04);
+            --shadow-modal: 0 24px 60px rgba(0, 0, 0, 0.12);
+            --toggle-transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease, opacity 0.25s ease;
+        }
+
+        [data-theme="dark"] {
+            --bg: #000000;
+            --sidebar-bg: rgba(28, 28, 30, 0.85);
+            --card-bg: #1C1C1E;
+            --border: rgba(255, 255, 255, 0.1);
+            --text-primary: #F5F5F7;
+            --text-secondary: #86868B;
+            --blue: #0A84FF;
+            --blue-hover: #2694FF;
+            --active-nav-bg: rgba(10, 132, 255, 0.15);
+            --active-nav-text: #0A84FF;
+            --green: #30D158;
+            --yellow: #FF9F0A;
+            --red: #FF453A;
+            --topbar-bg: rgba(28, 28, 30, 0.85);
+            --input-border: rgba(255, 255, 255, 0.2);
+            --hover-row: rgba(255, 255, 255, 0.06);
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            --shadow-card: 0 8px 30px rgba(0, 0, 0, 0.25);
+            --shadow-modal: 0 24px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Icons", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-size: 13px;
+            color: var(--text-primary);
+            background: var(--bg);
+            transition: var(--toggle-transition);
+            overflow-x: hidden;
+            line-height: 1.5;
+        }
+
+        /* Layout */
+        .app-container { display: flex; min-height: 100vh; min-height: 100svh; }
+
+        /* Sidebar */
+        .sidebar {
+            width: 64px;
+            background: var(--sidebar-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0; left: 0; bottom: 0;
+            z-index: 100;
+            transition: var(--toggle-transition);
+        }
+
+        .sidebar-logo {
+            padding: 16px 16px 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sidebar-logo .delta { color: var(--blue); font-size: 20px; font-weight: 700; }
+
+        .account-selector {
+            margin: 12px 12px 8px;
+            padding: 8px 10px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            color: var(--text-secondary);
+            transition: var(--toggle-transition);
+        }
+
+        .account-selector:hover { background: var(--hover-row); }
+
+        .account-avatar {
+            width: 28px; height: 28px;
+            border-radius: 6px;
+            background: linear-gradient(135deg, var(--blue), #00c6ff);
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 11px; font-weight: 600;
+        }
+
+        .nav-section { flex: 1; overflow-y: auto; padding: 4px 8px; }
+
+        .nav-item {
+            display: flex; align-items: center; justify-content: center;
+            width: 48px; height: 48px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            margin: 4px auto;
+            position: relative;
+            transition: all 0.15s ease;
+            user-select: none;
+        }
+
+        .nav-item:hover { background: var(--hover-row); }
+
+        .nav-item.active {
+            background: var(--active-nav-bg);
+            color: var(--active-nav-text);
+            font-weight: 600;
+        }
+
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 50%; transform: translateY(-50%);
+            width: 3px; height: 18px;
+            background: var(--blue);
+            border-radius: 0 2px 2px 0;
+        }
+
+        .nav-item i { width: 18px; height: 18px; }
+
+        .nav-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 8px 12px;
+        }
+
+        .sidebar-footer {
+            padding: 12px;
+            border-top: 1px solid var(--border);
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        /* Top Navigation */
+        .topbar {
+            position: fixed;
+            top: 0; left: 64px; right: 0;
+            height: 56px;
+            background: var(--topbar-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            z-index: 99;
+            transition: var(--toggle-transition);
+        }
+
+        .breadcrumb {
+            font-size: 14px;
+            color: var(--text-secondary);
+            display: flex; align-items: center; gap: 6px;
+        }
+
+        .breadcrumb .current { color: var(--text-primary); font-weight: 600; }
+
+        .topbar-actions {
+            display: flex; align-items: center; gap: 6px;
+        }
+
+        .icon-btn {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            position: relative;
+            transition: all 0.15s ease;
+        }
+
+        .icon-btn:hover { background: var(--hover-row); color: var(--text-primary); }
+
+        .badge {
+            position: absolute;
+            top: 4px; right: 4px;
+            width: 16px; height: 16px;
+            background: var(--red);
+            color: #fff;
+            font-size: 10px;
+            font-weight: 600;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .avatar-circle {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--blue), #00c6ff);
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 12px; font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 64px;
+            margin-top: 56px;
+            padding: 24px;
+            min-height: calc(100vh - 56px);
+            min-height: calc(100svh - 56px);
+            transition: var(--toggle-transition);
+        }
+
+        /* Page Header */
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .page-title { font-size: 20px; font-weight: 700; color: var(--text-primary); }
+
+        .page-actions {
+            display: flex; align-items: center; gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        /* Buttons */
+        .btn {
+            height: 36px;
+            padding: 0 14px;
+            border-radius: 6px;
+            border: none;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+            transition: all 0.15s ease;
+            white-space: nowrap;
+        }
+
+        .btn-primary { background: var(--blue); color: #fff; }
+        .btn-primary:hover { background: var(--blue-hover); }
+
+        .btn-secondary {
+            background: var(--hover-row);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+        .btn-secondary:hover { background: var(--border); }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid transparent;
+        }
+        .btn-ghost:hover { background: var(--hover-row); }
+
+        .btn-danger { background: #FA3E3E; color: #fff; }
+        .btn-danger:hover { background: #e03535; }
+
+        .btn-success { background: var(--green); color: #fff; }
+        .btn-success:hover { background: #3aa324; }
+
+        /* Dropdown / Select */
+        .select-dropdown {
+            height: 36px;
+            padding: 0 30px 0 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--card-bg);
+            color: var(--text-primary);
+            font-size: 13px;
+            font-family: inherit;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2365676B' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            transition: var(--toggle-transition);
+        }
+
+        [data-theme="dark"] .select-dropdown {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23B0B3B8' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+        }
+
+        .select-dropdown:focus {
+            outline: none;
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.15);
+        }
+
+        /* Input */
+        .input {
+            height: 36px;
+            padding: 0 12px;
+            border-radius: 8px;
+            border: 1px solid var(--input-border);
+            background: var(--card-bg);
+            color: var(--text-primary);
+            font-size: 13px;
+            font-family: inherit;
+            transition: var(--toggle-transition);
+            width: 100%;
+        }
+
+        .input:focus {
+            outline: none;
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.15);
+        }
+
+        .input::placeholder { color: var(--text-secondary); opacity: 0.7; }
+
+        /* Search Input */
+        .search-box {
+            position: relative;
+            width: 240px;
+        }
+
+        .search-box input {
+            padding-left: 34px;
+            width: 100%;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 10px; top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            width: 16px; height: 16px;
+        }
+
+        /* Card */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: var(--shadow-card);
+            transition: var(--toggle-transition);
+            overflow: hidden;
+        }
+
+        /* KPI Cards Row */
+        .kpi-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+            scrollbar-width: thin;
+        }
+
+        .kpi-row::-webkit-scrollbar { height: 4px; }
+        .kpi-row::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+        .kpi-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px 18px;
+            min-width: 150px;
+            flex: 1;
+            box-shadow: var(--shadow-card);
+            transition: var(--toggle-transition);
+        }
+
+        .kpi-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            margin-bottom: 4px;
+        }
+
+        .kpi-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.3;
+        }
+
+        .kpi-change {
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 2px;
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .kpi-change.up { color: var(--green); }
+        .kpi-change.down { color: var(--red); }
+
+        /* Charts Row */
+        .charts-row {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .chart-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: var(--shadow-card);
+            transition: var(--toggle-transition);
+        }
+
+        .chart-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .chart-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .chart-tabs {
+            display: flex;
+            gap: 0;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .chart-tab {
+            padding: 6px 14px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.15s ease;
+        }
+
+        .chart-tab:hover { color: var(--text-primary); }
+        .chart-tab.active { color: var(--blue); border-bottom-color: var(--blue); }
+
+        .chart-container { position: relative; height: 260px; }
+
+        /* Table */
+        .table-container { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 10px 12px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            border-bottom: 1px solid var(--border);
+            background: var(--card-bg);
+            white-space: nowrap;
+        }
+
+        .data-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        .data-table tbody tr {
+            height: 48px;
+            transition: background 0.1s ease;
+        }
+
+        .data-table tbody tr:hover { background: var(--hover-row); }
+
+        .data-table tbody tr:hover .row-actions { opacity: 1; }
+
+        .data-table tfoot td {
+            font-weight: 700;
+            border-top: 2px solid var(--border);
+            border-bottom: none;
+        }
+
+        .row-actions {
+            display: flex;
+            gap: 8px;
+            opacity: 0;
+            transition: opacity 0.15s ease;
+        }
+
+        .row-action-btn {
+            font-size: 12px;
+            color: var(--blue);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 500;
+        }
+
+        .row-action-btn:hover { text-decoration: underline; }
+
+        /* Status Badge */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 3px 10px;
+            border-radius: 100px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-badge .dot {
+            width: 7px; height: 7px;
+            border-radius: 50%;
+        }
+
+        .status-active { background: rgba(66,183,42,0.1); color: var(--green); }
+        .status-active .dot { background: var(--green); }
+
+        .status-paused { background: rgba(247,185,40,0.1); color: #b3891c; }
+        .status-paused .dot { background: var(--yellow); }
+
+        .status-ended { background: rgba(250,62,62,0.08); color: var(--red); }
+        .status-ended .dot { background: var(--red); }
+
+        [data-theme="dark"] .status-paused { background: rgba(247,185,40,0.15); color: var(--yellow); }
+
+        /* Toggle Switch */
+        .toggle-switch {
+            width: 36px;
+            height: 20px;
+            border-radius: 10px;
+            background: #ccc;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .toggle-switch.on { background: var(--green); }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 16px; height: 16px;
+            background: #fff;
+            border-radius: 50%;
+            top: 2px; left: 2px;
+            transition: transform 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+        .toggle-switch.on::after { transform: translateX(16px); }
+
+        /* Checkbox */
+        .checkbox {
+            width: 16px; height: 16px;
+            border: 1.5px solid var(--border);
+            border-radius: 4px;
+            cursor: pointer;
+            appearance: none;
+            background: var(--card-bg);
+            transition: var(--toggle-transition);
+            position: relative;
+        }
+
+        .checkbox:checked {
+            background: var(--blue);
+            border-color: var(--blue);
+        }
+
+        .checkbox:checked::after {
+            content: '';
+            position: absolute;
+            left: 4px; top: 1px;
+            width: 5px; height: 9px;
+            border: solid #fff;
+            border-width: 0 1.5px 1.5px 0;
+            transform: rotate(45deg);
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* Login Page */
+        .login-page {
+            min-height: 100vh;
+            min-height: 100svh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at 10% 20%, rgba(0, 113, 227, 0.05) 0%, transparent 40%),
+                        radial-gradient(circle at 90% 80%, rgba(0, 242, 254, 0.05) 0%, transparent 40%),
+                        var(--bg);
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 40px 36px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: var(--shadow-card);
+        }
+
+        .login-logo {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .login-logo .delta { color: var(--blue); font-size: 28px; font-weight: 700; }
+        .login-logo .brand { font-size: 18px; font-weight: 600; color: var(--text-primary); }
+
+        .login-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .form-group { margin-bottom: 14px; }
+
+        .form-label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .form-hint {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+        }
+
+        .form-hint code {
+            background: var(--hover-row);
+            padding: 1px 5px;
+            border-radius: 3px;
+            font-size: 11px;
+        }
+
+        /* OTP Input */
+        .otp-container {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .otp-input {
+            width: 44px;
+            height: 48px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: 600;
+            border: 1.5px solid var(--input-border);
+            border-radius: 8px;
+            background: var(--card-bg);
+            color: var(--text-primary);
+            transition: var(--toggle-transition);
+        }
+
+        .otp-input:focus {
+            outline: none;
+            border-color: var(--blue);
+            box-shadow: 0 0 0 2px rgba(24,119,242,0.2);
+        }
+
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            bottom: 20px; right: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .toast {
+            background: rgba(30, 30, 30, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #fff;
+            padding: 12px 18px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            animation: toastSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            max-width: 320px;
+        }
+
+        .toast.success { border-left: 4px solid var(--green); }
+        .toast.error { border-left: 4px solid var(--red); }
+        .toast.info { border-left: 4px solid var(--blue); }
+
+        @keyframes toastSlideIn {
+            from { transform: translateY(30px) scale(0.9); opacity: 0; }
+            to { transform: translateY(0) scale(1); opacity: 1; }
+        }
+
+        @keyframes toastSlideOut {
+            from { transform: translateY(0) scale(1); opacity: 1; }
+            to { transform: translateY(20px) scale(0.92); opacity: 0; }
+        }
+
+        /* Notification Panel */
+        .notif-panel {
+            position: fixed;
+            top: 56px; right: -360px;
+            width: 360px;
+            bottom: 0;
+            background: var(--card-bg);
+            border-left: 1px solid var(--border);
+            box-shadow: -4px 0 16px rgba(0,0,0,0.1);
+            z-index: 200;
+            transition: right 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .notif-panel.open { right: 0; }
+
+        .notif-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .notif-header h3 { font-size: 16px; font-weight: 700; }
+
+        .notif-item {
+            padding: 14px 20px;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: background 0.1s ease;
+        }
+
+        .notif-item:hover { background: var(--hover-row); }
+
+        .notif-item-title { font-weight: 600; font-size: 13px; margin-bottom: 3px; }
+        .notif-item-text { font-size: 12px; color: var(--text-secondary); line-height: 1.4; }
+        .notif-item-time { font-size: 11px; color: var(--text-secondary); margin-top: 4px; }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        .modal-overlay.active { opacity: 1; pointer-events: all; }
+
+        .modal {
+            background: var(--card-bg);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 520px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-modal);
+            transform: scale(0.94) translateY(10px);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .modal-overlay.active .modal { transform: scale(1) translateY(0); }
+
+        .modal-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-header h3 { font-size: 16px; font-weight: 700; }
+
+        .modal-body { padding: 20px; }
+
+        .modal-footer {
+            padding: 14px 20px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-secondary);
+            display: flex;
+            padding: 4px;
+            border-radius: 50%;
+        }
+
+        .modal-close:hover { background: var(--hover-row); }
+
+        /* Creative Grid */
+        .creative-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .creative-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow-card);
+            transition: var(--toggle-transition);
+            position: relative;
+        }
+
+        .creative-placeholder {
+            height: 180px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .creative-placeholder.video {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .creative-placeholder.carousel {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .creative-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .creative-card:hover .creative-overlay { opacity: 1; }
+
+        .creative-info { padding: 12px; }
+        .creative-name { font-weight: 600; font-size: 13px; margin-bottom: 6px; }
+        .creative-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+        .creative-metrics { font-size: 12px; color: var(--text-secondary); }
+
+        .format-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .format-image { background: rgba(24,119,242,0.1); color: var(--blue); }
+        .format-video { background: rgba(245,87,108,0.1); color: #f5576c; }
+        .format-carousel { background: rgba(0,242,254,0.1); color: #00a8c6; }
+
+        /* Tabs */
+        .tabs { display: flex; gap: 0; border-bottom: 2px solid var(--border); margin-bottom: 16px; }
+        .tab {
+            padding: 10px 18px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.15s ease;
+            user-select: none;
+        }
+        .tab:hover { color: var(--text-primary); }
+        .tab.active { color: var(--blue); border-bottom-color: var(--blue); }
+
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        /* Progress Bar */
+        .progress-bar {
+            height: 8px;
+            background: var(--hover-row);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: var(--blue);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        /* Phone Mockup */
+        .phone-mockup {
+            width: 280px;
+            border: 12px solid #1a1a1a;
+            border-radius: 32px;
+            overflow: hidden;
+            background: #fff;
+            flex-shrink: 0;
+        }
+        .phone-screen {
+            aspect-ratio: 9/16;
+            background: linear-gradient(180deg, #f0f2f5 0%, #e4e6eb 100%);
+            display: flex;
+            flex-direction: column;
+            padding: 16px;
+        }
+        .phone-ad-image {
+            height: 160px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        .phone-ad-text { font-size: 12px; color: #333; line-height: 1.4; }
+        .phone-ad-headline { font-size: 14px; font-weight: 700; color: #1c1e21; margin: 6px 0; }
+        .phone-cta {
+            margin-top: auto;
+            padding: 10px;
+            background: var(--blue);
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* Utility */
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .gap-2 { gap: 8px; }
+        .gap-3 { gap: 12px; }
+        .gap-4 { gap: 16px; }
+        .mt-2 { margin-top: 8px; }
+        .mt-3 { margin-top: 12px; }
+        .mt-4 { margin-top: 16px; }
+        .mb-2 { margin-bottom: 8px; }
+        .mb-3 { margin-bottom: 12px; }
+        .mb-4 { margin-bottom: 16px; }
+        .p-3 { padding: 12px; }
+        .p-4 { padding: 16px; }
+        .text-secondary { color: var(--text-secondary); }
+        .text-sm { font-size: 12px; }
+        .text-xs { font-size: 11px; }
+        .font-semibold { font-weight: 600; }
+        .font-bold { font-weight: 700; }
+        .w-full { width: 100%; }
+        .hidden { display: none !important; }
+
+        /* Skeleton Loading */
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        .skeleton {
+            background: linear-gradient(90deg, var(--hover-row) 25%, var(--border) 50%, var(--hover-row) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 4px;
+        }
+
+        /* Mobile Menu Button */
+        .mobile-menu-btn {
+            display: none;
+            margin-right: 8px;
+        }
+
+        .sidebar-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5); z-index: 199;
+            display: none;
+        }
+        .sidebar-overlay.active { display: block; }
+
+        /* Billing page responsive cards grid */
+        .billing-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        /* Creative Preview modal container */
+        .ad-preview-container {
+            display: flex;
+            gap: 24px;
+            align-items: flex-start;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            /* Optimize transitions on mobile to prevent layout paint/reflow lag */
+            body, .main-content, .card, .kpi-card, .chart-card, .creative-card, .select-dropdown, .input, .otp-input, .btn, .icon-btn, .row-action-btn {
+                transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease !important;
+            }
+
+            .sidebar { 
+                position: fixed; 
+                left: 0; 
+                top: 0; 
+                bottom: 0; 
+                width: 260px; 
+                z-index: 200; 
+                transform: translateX(-100%);
+                transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+                align-items: stretch; 
+                backdrop-filter: none !important; 
+                -webkit-backdrop-filter: none !important; 
+                background: var(--sidebar-bg);
+            }
+            .sidebar.open { transform: translateX(0); box-shadow: 4px 0 16px rgba(0,0,0,0.1); }
+            .sidebar .nav-section { padding: 0 16px; width: 100%; box-sizing: border-box; display: flex; flex-direction: column; align-items: stretch; }
+            .sidebar .nav-item { width: 100%; justify-content: flex-start; padding: 0 16px; gap: 12px; }
+            .sidebar .nav-item::after { content: attr(title); font-size: 15px; font-weight: 500; display: block; }
+            .sidebar .sidebar-logo { justify-content: flex-start !important; padding-left: 24px !important; }
+            .sidebar .sidebar-logo::after { content: "Meta Ads"; font-weight: 700; font-size: 18px; color: var(--text-primary); margin-left: 8px; }
+            .sidebar .account-selector { justify-content: flex-start !important; padding: 8px 12px !important; margin: 8px 16px 24px !important; background: var(--hover-row); border-radius: 8px; }
+            .sidebar .account-selector::after { content: "Switch Account"; font-size: 14px; margin-left: 12px; font-weight: 600; color: var(--text-primary); }
+            .sidebar .sidebar-footer { text-align: left; padding: 16px 24px !important; font-size: 12px !important; }
+            
+            .topbar { 
+                left: 0; 
+                padding: 0 8px; 
+                display: flex; 
+                align-items: center; 
+                justify-content: space-between; 
+                backdrop-filter: none !important; 
+                -webkit-backdrop-filter: none !important; 
+                background: var(--card-bg) !important;
+            }
+            .topbar > div:first-child { width: auto; flex: unset; }
+            .mobile-logo { display: flex !important; position: static !important; transform: none !important; align-items: center; margin-left: 8px; }
+            .breadcrumb-container { display: none !important; }
+            .mobile-menu-btn { display: flex; margin-right: 0; }
+            .topbar-actions { gap: 4px; }
+            
+            .main-content { margin-left: 0 !important; width: 100% !important; padding: 12px 16px !important; }
+            .charts-row { grid-template-columns: 1fr; }
+            .creative-grid { grid-template-columns: 1fr; }
+            .kpi-row { display: grid; grid-template-columns: 1fr 1fr; flex-wrap: unset; overflow-x: visible; }
+            .search-box { display: none; }
+
+            /* Responsive Layout Grids */
+            .billing-grid {
+                grid-template-columns: 1fr;
+            }
+            .ad-preview-container {
+                flex-direction: column;
+                align-items: center;
+                gap: 16px;
+            }
+            .ad-preview-container > .phone-mockup {
+                width: 100%;
+                max-width: 280px;
+            }
+            .ad-preview-container > div:last-child {
+                width: 100%;
+            }
+            
+            /* Set a min-width on data tables to prevent column squishing / text truncation on mobile */
+            .data-table { min-width: 900px; }
+            
+            /* Removed .hide-mobile to allow tables to scroll horizontally showing all data */
+            .page-actions, .tabs, .filter-row { display: flex; flex-wrap: nowrap; overflow-x: auto; white-space: nowrap; scrollbar-width: none; max-width: 100%; padding-bottom: 4px; -webkit-overflow-scrolling: touch; }
+            .page-actions::-webkit-scrollbar, .tabs::-webkit-scrollbar, .filter-row::-webkit-scrollbar { display: none; }
+            
+            .chart-container, canvas { width: 100% !important; height: 220px !important; }
+            
+            .modal, .add-funds-modal, .invite-modal, .creative-preview-modal { width: 95vw !important; max-height: 90vh !important; overflow-y: auto; margin: auto; }
+            .login-card { width: 90% !important; max-width: 400px !important; margin: auto; }
+            .input { width: 100%; box-sizing: border-box; }
+            
+            .card, .table-container, .chart-card, .creative-card, .toast { width: 100% !important; max-width: 100% !important; }
+            .notif-panel { width: 100% !important; max-width: 100% !important; right: -100%; }
+            .notif-panel.open { right: 0; }
+        }
+
+        @media (max-width: 480px) {
+            .kpi-row { grid-template-columns: 1fr; }
+        }
+
+        /* Page visibility */
+        .page-section { 
+            display: none; 
+            animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards; 
+            will-change: transform, opacity;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+        .page-section.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate3d(0, 10px, 0); }
+            to { opacity: 1; transform: translate3d(0, 0, 0); }
+        }
+
+        /* Apple-style Micro-animations & Interactive Elements */
+        .card, .kpi-card, .chart-card, .creative-card {
+            transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.3s cubic-bezier(0.25, 1, 0.5, 1), background-color 0.3s, border-color 0.3s;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            transform: translate3d(0, 0, 0);
+        }
+        
+        @media (hover: hover) {
+            .card:hover, .kpi-card:hover, .chart-card:hover, .creative-card:hover {
+                transform: translate3d(0, -2px, 0);
+                box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+                border-color: rgba(0, 113, 227, 0.2);
+            }
+            
+            [data-theme="dark"] .card:hover, 
+            [data-theme="dark"] .kpi-card:hover, 
+            [data-theme="dark"] .chart-card:hover, 
+            [data-theme="dark"] .creative-card:hover {
+                box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+                border-color: rgba(10, 132, 255, 0.3);
+            }
+
+            .btn:hover {
+                transform: translate3d(0, -1px, 0);
+            }
+
+            .nav-item:hover {
+                transform: scale(1.08) translate3d(0, 0, 0);
+            }
+        }
+
+        .btn, .icon-btn, .row-action-btn, .select-dropdown, .input {
+            transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), background-color 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s !important;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            transform: translate3d(0, 0, 0);
+        }
+
+        .btn:active, .icon-btn:active, .row-action-btn:active {
+            transform: scale(0.96) translate3d(0, 0, 0);
+        }
+
+        .nav-item {
+            transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1), background-color 0.2s, color 0.2s;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            transform: translate3d(0, 0, 0);
+        }
+
+        .nav-item:active {
+            transform: scale(0.92) translate3d(0, 0, 0);
+        }
+
+        /* Section Header */
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .section-title { font-size: 15px; font-weight: 700; color: var(--text-primary); }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 48px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state i { margin-bottom: 12px; color: var(--border); }
+        .empty-state h4 { font-size: 15px; font-weight: 600; margin-bottom: 6px; color: var(--text-primary); }
+        .empty-state p { font-size: 13px; margin-bottom: 16px; }
+
+        /* Settings row */
+        .settings-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .settings-row:last-child { border-bottom: none; }
+        .settings-label { font-weight: 600; font-size: 13px; }
+        .settings-desc { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+
+        /* Activity log */
+        .log-entry {
+            display: flex;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .log-time { font-size: 11px; color: var(--text-secondary); min-width: 70px; }
+        .log-content { flex: 1; }
+        .log-user { font-weight: 600; font-size: 12px; }
+        .log-action { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+        .log-ip { font-size: 11px; color: var(--text-secondary); font-family: monospace; }
+
+        /* 1. GPU layer promotion for animated elements, cards, and data-animate */
+        .hero, .card, .animated-element, [data-animate] {
+            will-change: transform, opacity;
+            transform: translateZ(0);
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+
+        /* 2. iOS viewport fix */
+        .hero, .section, .fullscreen {
+            height: 100vh;
+            height: 100svh;
+        }
+
+        /* 3. Replace layout-triggering animations */
+        .animate-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+        .animate-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* 6. Reduce heavy effects on mobile inside media query */
+        @media (max-width: 768px) {
+            * {
+                backdrop-filter: blur(8px) !important;
+                -webkit-backdrop-filter: blur(8px) !important;
+            }
+            .card, .glass, .modal {
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2) !important;
+            }
+            .bg-gradient, .gradient-layer {
+                opacity: 0.7 !important;
+            }
+        }
+
+        /* 7. Remove tap delay on all clickable elements */
+        a, button, .btn, .nav-link, .clickable, [role="button"] {
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ==================== LOGIN PAGE ==================== -->
+<div id="loginPage" class="login-page">
+    <div class="login-card">
+        <div class="login-logo">
+            <div style="display:flex;align-items:center;justify-content:center;gap:8px;">
+                <svg viewBox="0 0 24 24" style="width: 38px; height: 38px;">
+                    <defs>
+                        <linearGradient id="metaGradLogin" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#0064E0" />
+                            <stop offset="50%" stop-color="#0080FF" />
+                            <stop offset="100%" stop-color="#00F2FE" />
+                        </linearGradient>
+                    </defs>
+                    <path d="M7 17a5 5 0 0 1-5-5 5 5 0 0 1 7-5c2.3 0 4 1.8 5 3 1-1.2 2.7-3 5-3a5 5 0 0 1 5 5 5 5 0 0 1-5 5c-2.3 0-4-1.8-5-3-1 1.2-2.7 3-5 3z" fill="url(#metaGradLogin)" />
+                </svg>
+                <span class="brand" style="font-size: 28px; font-weight: 800; letter-spacing: -0.5px; background: linear-gradient(135deg, var(--text-primary) 30%, var(--blue) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Meta Ads</span>
+            </div>
+            <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;letter-spacing:1px;text-transform:uppercase;font-weight:600;">Advertising</div>
+        </div>
+
+        <!-- Step 1: Credentials -->
+        <div id="loginStep1">
+            <div class="login-title">Sign in to your account</div>
+            <div class="form-group">
+                <label class="form-label">Email</label>
+                <input type="email" class="input" id="loginEmail" placeholder="Enter your email">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                <input type="password" class="input" id="loginPassword" placeholder="Enter your password">
+            </div>
+            <div style="text-align:right;margin-bottom:16px;">
+                <a href="#" style="font-size:12px;color:var(--blue);text-decoration:none;font-weight:500;" onclick="handleForgotPassword()">Forgot password?</a>
+            </div>
+            <button class="btn btn-primary w-full" onclick="handleLogin()" style="height:40px;">Log In</button>
+        </div>
+
+        <!-- Step 2: OTP -->
+        <div id="loginStep2" class="hidden">
+            <div class="login-title">Enter verification code</div>
+            <p style="text-align:center;font-size:12px;color:var(--text-secondary);margin-bottom:16px;">
+                We sent a 6-digit code to your email
+            </p>
+            <div class="otp-container">
+                <input type="text" class="otp-input" maxlength="1" data-otp-index="0">
+                <input type="text" class="otp-input" maxlength="1" data-otp-index="1">
+                <input type="text" class="otp-input" maxlength="1" data-otp-index="2">
+                <input type="text" class="otp-input" maxlength="1" data-otp-index="3">
+                <input type="text" class="otp-input" maxlength="1" data-otp-index="4">
+                <input type="text" class="otp-input" maxlength="1" data-otp-index="5">
+            </div>
+            <button class="btn btn-primary w-full" onclick="handleOTP()" style="height:40px;">Verify</button>
+            <div style="text-align:center;margin-top:12px;">
+                <a href="#" style="font-size:12px;color:var(--blue);text-decoration:none;font-weight:500;" onclick="showLoginStep(1)">Back to login</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== MAIN APP ==================== -->
+<div id="appContainer" class="app-container hidden">
+
+    <!-- Mobile Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="document.getElementById('sidebar').classList.remove('open'); this.classList.remove('active')"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo" style="justify-content: center; padding: 20px 0;">
+            <svg viewBox="0 0 24 24" style="width: 32px; height: 32px;">
+                <defs>
+                    <linearGradient id="metaGradSidebar" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#0064E0" />
+                        <stop offset="50%" stop-color="#0080FF" />
+                        <stop offset="100%" stop-color="#00F2FE" />
+                    </linearGradient>
+                </defs>
+                <path d="M7 17a5 5 0 0 1-5-5 5 5 0 0 1 7-5c2.3 0 4 1.8 5 3 1-1.2 2.7-3 5-3a5 5 0 0 1 5 5 5 5 0 0 1-5 5c-2.3 0-4-1.8-5-3-1 1.2-2.7 3-5 3z" fill="url(#metaGradSidebar)" />
+            </svg>
+        </div>
+
+        <div class="account-selector" onclick="handleAccountSwitch()" style="justify-content: center; border: none; padding: 6px; margin: 8px;">
+            <div class="account-avatar" style="width: 32px; height: 32px; font-size: 14px;">M</div>
+        </div>
+
+        <nav class="nav-section">
+            <div class="nav-item active" data-page="overview" onclick="navigateTo('overview')" title="Overview">
+                <i data-lucide="layout-dashboard"></i>
+            </div>
+            <div class="nav-item" data-page="campaigns" onclick="navigateTo('campaigns')" title="Campaigns">
+                <i data-lucide="grid-3x3"></i>
+            </div>
+            <div class="nav-item" data-page="analytics" onclick="navigateTo('analytics')" title="Analytics">
+                <i data-lucide="bar-chart-3"></i>
+            </div>
+            <div class="nav-item" data-page="creative" onclick="navigateTo('creative')" title="Creative Library">
+                <i data-lucide="image"></i>
+            </div>
+            <div class="nav-item" data-page="billing" onclick="navigateTo('billing')" title="Billing">
+                <i data-lucide="credit-card"></i>
+            </div>
+            <div class="nav-divider"></div>
+            <div class="nav-item" data-page="admin" id="adminNavItem" onclick="navigateTo('admin')" title="Admin Panel">
+                <i data-lucide="shield"></i>
+            </div>
+        </nav>
+
+        <div class="sidebar-footer" style="padding: 12px 4px; font-size: 10px;">
+            Meta Ads
+        </div>
+    </aside>
+
+    <!-- Top Bar -->
+    <header class="topbar" id="topbar">
+        <div style="display:flex;align-items:center;flex:1;">
+            <button class="icon-btn mobile-menu-btn" onclick="document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sidebarOverlay').classList.toggle('active')">
+                <i data-lucide="menu"></i>
+            </button>
+            <div class="mobile-logo" style="display:none; font-weight:700; font-size:18px; color:var(--text-primary); align-items:center; gap:6px;">
+                <svg viewBox="0 0 24 24" style="width: 24px; height: 24px;">
+                    <defs>
+                        <linearGradient id="metaGradMobile" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#0064E0" />
+                            <stop offset="50%" stop-color="#0080FF" />
+                            <stop offset="100%" stop-color="#00F2FE" />
+                        </linearGradient>
+                    </defs>
+                    <path d="M7 17a5 5 0 0 1-5-5 5 5 0 0 1 7-5c2.3 0 4 1.8 5 3 1-1.2 2.7-3 5-3a5 5 0 0 1 5 5 5 5 0 0 1-5 5c-2.3 0-4-1.8-5-3-1 1.2-2.7 3-5 3z" fill="url(#metaGradMobile)" />
+                </svg>
+                <span>Meta Ads</span>
+            </div>
+            <div class="breadcrumb-container" style="display:flex;align-items:center;">
+                <div class="breadcrumb">
+                    <span>Meta Ads Manager</span>
+                    <i data-lucide="chevron-right" style="width:14px;height:14px;margin:0 6px;"></i>
+                    <span class="current" id="breadcrumbCurrent">Overview</span>
+                </div>
+            </div>
+        </div>
+        <div class="topbar-actions">
+            <button class="icon-btn" id="themeToggle" onclick="toggleTheme()" title="Toggle theme">
+                <i data-lucide="sun" id="themeIcon"></i>
+            </button>
+            <button class="icon-btn" onclick="toggleNotifPanel()" title="Notifications">
+                <i data-lucide="bell"></i>
+                <span class="badge">3</span>
+            </button>
+            <div class="avatar-circle" id="userAvatar">M</div>
+        </div>
+    </header>
+
+    <!-- Notification Panel -->
+    <div class="notif-panel" id="notifPanel">
+        <div class="notif-header">
+            <h3>Notifications</h3>
+            <button class="modal-close" onclick="toggleNotifPanel()">
+                <i data-lucide="x" style="width:18px;height:18px;"></i>
+            </button>
+        </div>
+        <div class="notif-item" onclick="showToast('Campaign approved','success');toggleNotifPanel()">
+            <div class="notif-item-title">Campaign Approved</div>
+            <div class="notif-item-text">Your "Diwali Sale 2024" campaign has been approved and is now active.</div>
+            <div class="notif-item-time">2 hours ago</div>
+        </div>
+        <div class="notif-item" onclick="showToast('Budget alert','info');toggleNotifPanel()">
+            <div class="notif-item-title">Budget Alert</div>
+            <div class="notif-item-text">You've spent 70% of your daily budget for "Brand Awareness Q4".</div>
+            <div class="notif-item-time">5 hours ago</div>
+        </div>
+        <div class="notif-item" onclick="showToast('Payment successful','success');toggleNotifPanel()">
+            <div class="notif-item-title">Payment Successful</div>
+            <div class="notif-item-text">Your wallet has been credited with INR 25,000 via UPI.</div>
+            <div class="notif-item-time">1 day ago</div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+
+        <!-- ==================== OVERVIEW PAGE ==================== -->
+        <section id="page-overview" class="page-section active">
+            <div class="page-header">
+                <h1 class="page-title">Overview</h1>
+                <div class="page-actions">
+                    <select class="select-dropdown" id="overviewDateRange" onchange="updateOverviewCharts()">
+                        <option value="7">Last 7 days</option>
+                        <option value="14">Last 14 days</option>
+                        <option value="30" selected>Last 30 days</option>
+                        <option value="90">Last 90 days</option>
+                    </select>
+                    <select class="select-dropdown">
+                        <option>Breakdown: None</option>
+                        <option>Campaign</option>
+                        <option>Day</option>
+                        <option>Platform</option>
+                    </select>
+                    <button class="btn btn-secondary" onclick="handleFilters()">
+                        <i data-lucide="filter" style="width:14px;height:14px;"></i> Filters
+                    </button>
+                    <button class="btn btn-secondary" onclick="showToast('Export started','success')">
+                        <i data-lucide="download" style="width:14px;height:14px;"></i> Export
+                    </button>
+                </div>
+            </div>
+
+            <!-- KPI Row -->
+            <div class="kpi-row" id="kpiRow">
+                <div class="kpi-card">
+                    <div class="kpi-label">Amount Spent</div>
+                    <div class="kpi-value">INR 70,000</div>
+                    <div class="kpi-change up"><i data-lucide="arrow-up" style="width:12px;height:12px;"></i> +12.4%</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Impressions</div>
+                    <div class="kpi-value">8,24,500</div>
+                    <div class="kpi-change up"><i data-lucide="arrow-up" style="width:12px;height:12px;"></i> +8.1%</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Clicks (All)</div>
+                    <div class="kpi-value">14,820</div>
+                    <div class="kpi-change up"><i data-lucide="arrow-up" style="width:12px;height:12px;"></i> +5.3%</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">CTR (All)</div>
+                    <div class="kpi-value">1.80%</div>
+                    <div class="kpi-change down"><i data-lucide="arrow-down" style="width:12px;height:12px;"></i> -0.2%</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">CPC (All)</div>
+                    <div class="kpi-value">INR 4.72</div>
+                    <div class="kpi-change down"><i data-lucide="arrow-down" style="width:12px;height:12px;"></i> -3.1%</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Conversions</div>
+                    <div class="kpi-value">342</div>
+                    <div class="kpi-change up"><i data-lucide="arrow-up" style="width:12px;height:12px;"></i> +18.7%</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">ROAS</div>
+                    <div class="kpi-value">4.2x</div>
+                    <div class="kpi-change up"><i data-lucide="arrow-up" style="width:12px;height:12px;"></i> +6.2%</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Reach</div>
+                    <div class="kpi-value">3,12,400</div>
+                    <div class="kpi-change up"><i data-lucide="arrow-up" style="width:12px;height:12px;"></i> +4.8%</div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="charts-row">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <span class="chart-title">Amount Spent vs Conversions</span>
+                        <div class="chart-tabs">
+                            <div class="chart-tab active" onclick="switchChartTab(this,'daily')">Daily</div>
+                            <div class="chart-tab" onclick="switchChartTab(this,'weekly')">Weekly</div>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="overviewLineChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <span class="chart-title">Spend by Campaign</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="overviewDoughnutChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Campaign Preview Table -->
+            <div class="card">
+                <div class="p-4" style="display:flex;align-items:center;justify-content:space-between;">
+                    <h3 class="section-title">Top Campaigns</h3>
+                    <a href="#" style="font-size:12px;color:var(--blue);font-weight:600;text-decoration:none;" onclick="navigateTo('campaigns')">See all campaigns &rarr;</a>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Campaign</th>
+                                <th>Delivery</th>
+                                <th>Budget</th>
+                                <th>Amount Spent</th>
+                                <th>Results</th>
+                                <th>CTR</th>
+                                <th>CPC</th>
+                            </tr>
+                        </thead>
+                        <tbody id="overviewCampaignTable">
+                            <!-- Filled by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== CAMPAIGNS PAGE ==================== -->
+        <section id="page-campaigns" class="page-section">
+            <div class="page-header">
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <h1 class="page-title">Campaigns</h1>
+                    <button class="btn btn-primary" onclick="handleCreateCampaign()">
+                        <i data-lucide="plus" style="width:14px;height:14px;"></i> Create
+                    </button>
+                </div>
+                <div class="page-actions">
+                    <div class="search-box">
+                        <i data-lucide="search"></i>
+                        <input type="text" class="input" placeholder="Search campaigns..." id="campaignSearch" oninput="filterCampaigns()">
+                    </div>
+                    <select class="select-dropdown" id="deliveryFilter" onchange="filterCampaigns()">
+                        <option value="all">All Delivery</option>
+                        <option value="active">Active</option>
+                        <option value="paused">Paused</option>
+                        <option value="ended">Ended</option>
+                    </select>
+                    <select class="select-dropdown">
+                        <option>Columns</option>
+                        <option>Performance</option>
+                        <option>Engagement</option>
+                        <option>Conversions</option>
+                    </select>
+                    <button class="btn btn-secondary" onclick="showToast('Export started','success')">
+                        <i data-lucide="download" style="width:14px;height:14px;"></i> Export
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th class="hide-mobile"><input type="checkbox" class="checkbox" id="selectAllCampaigns" onchange="toggleSelectAll()"></th>
+                                <th>Campaign Name</th>
+                                <th>Delivery</th>
+                                <th>Budget</th>
+                                <th class="hide-mobile">Amount Spent</th>
+                                <th class="hide-mobile">Results</th>
+                                <th class="hide-mobile">Reach</th>
+                                <th class="hide-mobile">Impressions</th>
+                                <th class="hide-mobile">CPR</th>
+                                <th class="hide-mobile">CTR</th>
+                                <th class="hide-mobile">CPC</th>
+                                <th class="hide-mobile">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="campaignsTableBody">
+                            <!-- Filled by JS -->
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td class="hide-mobile"></td>
+                                <td><strong>Total (8 campaigns)</strong></td>
+                                <td></td>
+                                <td>INR 25,800/day</td>
+                                <td class="hide-mobile">INR 1,64,500</td>
+                                <td class="hide-mobile">—</td>
+                                <td class="hide-mobile">3,78,400</td>
+                                <td class="hide-mobile">28,49,300</td>
+                                <td class="hide-mobile">—</td>
+                                <td class="hide-mobile">2.14%</td>
+                                <td class="hide-mobile">INR 4.23</td>
+                                <td class="hide-mobile"></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                <div class="pagination">
+                    <span>Showing 1&ndash;8 of 8 campaigns</span>
+                    <div style="display:flex;gap:4px;">
+                        <button class="btn btn-secondary" style="height:32px;padding:0 10px;" disabled>
+                            <i data-lucide="chevron-left" style="width:14px;height:14px;"></i>
+                        </button>
+                        <button class="btn btn-secondary" style="height:32px;padding:0 10px;" disabled>
+                            <i data-lucide="chevron-right" style="width:14px;height:14px;"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== ANALYTICS PAGE ==================== -->
+        <section id="page-analytics" class="page-section">
+            <div class="page-header">
+                <h1 class="page-title">Analytics</h1>
+                <div class="page-actions">
+                    <select class="select-dropdown" onchange="updateAnalyticsCharts()">
+                        <option value="7">Last 7 days</option>
+                        <option value="14">Last 14 days</option>
+                        <option value="30" selected>Last 30 days</option>
+                        <option value="90">Last 90 days</option>
+                    </select>
+                    <button class="btn btn-secondary" onclick="showToast('Export started','success')">
+                        <i data-lucide="download" style="width:14px;height:14px;"></i> Export
+                    </button>
+                </div>
+            </div>
+
+            <div class="tabs">
+                <div class="tab active" onclick="switchAnalyticsTab(this,'performance')">Performance</div>
+                <div class="tab" onclick="switchAnalyticsTab(this,'audience')">Audience</div>
+                <div class="tab" onclick="switchAnalyticsTab(this,'placement')">Placement</div>
+            </div>
+
+            <!-- Performance Tab -->
+            <div id="analytics-performance" class="tab-panel active">
+                <div class="mb-3" style="display:flex;align-items:center;gap:8px;">
+                    <label class="checkbox-wrapper" style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;color:var(--text-secondary);">
+                        <input type="checkbox" class="checkbox" onchange="toggleComparison(this)">
+                        Compare to previous period
+                    </label>
+                </div>
+                <div class="chart-card mb-3">
+                    <div class="chart-header">
+                        <span class="chart-title">Multi-Metric Performance</span>
+                    </div>
+                    <div class="chart-container" style="height:320px;">
+                        <canvas id="analyticsLineChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <span class="chart-title">CTR by Campaign</span>
+                    </div>
+                    <div class="chart-container" style="height:240px;">
+                        <canvas id="analyticsBarChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Audience Tab -->
+            <div id="analytics-audience" class="tab-panel">
+                <div class="charts-row">
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <span class="chart-title">Age Breakdown</span>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="ageChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <span class="chart-title">Gender Split</span>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="genderChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="card mt-3">
+                    <div class="p-4">
+                        <h3 class="section-title mb-3">Top Locations</h3>
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr><th>City</th><th>Amount Spent</th><th>Impressions</th><th>Clicks</th><th>CTR</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td><strong>Mumbai</strong></td><td>INR 18,400</td><td>2,18,500</td><td>4,120</td><td>1.89%</td></tr>
+                                    <tr><td><strong>Delhi</strong></td><td>INR 14,200</td><td>1,72,000</td><td>3,280</td><td>1.91%</td></tr>
+                                    <tr><td><strong>Bengaluru</strong></td><td>INR 12,800</td><td>1,54,200</td><td>2,980</td><td>1.93%</td></tr>
+                                    <tr><td><strong>Hyderabad</strong></td><td>INR 9,200</td><td>1,12,400</td><td>2,140</td><td>1.90%</td></tr>
+                                    <tr><td><strong>Pune</strong></td><td>INR 7,400</td><td>92,800</td><td>1,780</td><td>1.92%</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Placement Tab -->
+            <div id="analytics-placement" class="tab-panel">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <span class="chart-title">Impressions by Placement</span>
+                    </div>
+                    <div class="chart-container" style="height:320px;">
+                        <canvas id="placementChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== CREATIVE LIBRARY PAGE ==================== -->
+        <section id="page-creative" class="page-section">
+            <div class="page-header">
+                <h1 class="page-title">Creative Library</h1>
+                <div class="page-actions">
+                    <button class="btn btn-primary" onclick="handleUploadDialog()">
+                        <i data-lucide="upload" style="width:14px;height:14px;"></i> Upload
+                    </button>
+                    <button class="btn btn-secondary" onclick="openCreateAdModal()">
+                        <i data-lucide="plus" style="width:14px;height:14px;"></i> Create Ad
+                    </button>
+                    <select class="select-dropdown">
+                        <option>All Formats</option>
+                        <option>Image</option>
+                        <option>Video</option>
+                        <option>Carousel</option>
+                    </select>
+                    <div style="display:flex;border:1px solid var(--border);border-radius:6px;overflow:hidden;">
+                        <button class="btn btn-ghost" style="height:34px;border-radius:0;border-right:1px solid var(--border);" onclick="setCreativeView('grid')">
+                            <i data-lucide="layout-grid" style="width:14px;height:14px;"></i>
+                        </button>
+                        <button class="btn btn-ghost" style="height:34px;border-radius:0;" onclick="setCreativeView('list')">
+                            <i data-lucide="list" style="width:14px;height:14px;"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="creative-grid" id="creativeGrid">
+                <!-- Filled by JS -->
+            </div>
+        </section>
+
+        <!-- ==================== BILLING PAGE ==================== -->
+        <section id="page-billing" class="page-section">
+            <div class="page-header">
+                <h1 class="page-title">Billing</h1>
+                <div class="page-actions">
+                    <button class="btn btn-secondary" onclick="showToast('Export started','success')">
+                        <i data-lucide="download" style="width:14px;height:14px;"></i> Export
+                    </button>
+                </div>
+            </div>
+
+            <div class="billing-grid">
+                <!-- Spending Limit -->
+                <div class="card p-4">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+                        <h3 class="section-title">Account Spending Limit</h3>
+                        <button class="btn btn-secondary" style="height:32px;" onclick="handleEditLimit()">Edit Limit</button>
+                    </div>
+                    <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:10px;">
+                        <span style="font-size:24px;font-weight:700;">INR 70,000</span>
+                        <span style="color:var(--text-secondary);">/ INR 1,00,000</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width:70%;"></div>
+                    </div>
+                    <div class="text-sm text-secondary mt-2">70% of your monthly limit used</div>
+                </div>
+
+                <!-- Wallet Balance -->
+                <div class="card p-4">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+                        <h3 class="section-title">Wallet Balance</h3>
+                        <button class="btn btn-success" style="height:32px;" onclick="openAddFundsModal()">
+                            <i data-lucide="plus" style="width:14px;height:14px;"></i> Add Funds
+                        </button>
+                    </div>
+                    <div style="font-size:28px;font-weight:700;margin-bottom:10px;">INR 28,400</div>
+                    <div class="settings-row" style="padding:8px 0;">
+                        <div>
+                            <div class="settings-label">Auto-recharge</div>
+                        </div>
+                        <div class="toggle-switch on" onclick="this.classList.toggle('on');showToast('Auto-recharge toggled','success')"></div>
+                    </div>
+                    <div class="text-xs text-secondary">Recharge when balance falls below INR 5,000</div>
+                </div>
+            </div>
+
+            <!-- Payment Methods -->
+            <div class="card p-4 mb-3">
+                <div class="section-header">
+                    <h3 class="section-title">Payment Methods</h3>
+                    <button class="btn btn-secondary" style="height:32px;" onclick="handleAddPaymentMethod()">
+                        <i data-lucide="plus" style="width:14px;height:14px;"></i> Add Payment Method
+                    </button>
+                </div>
+                <div id="paymentMethods">
+                    <!-- Filled by JS -->
+                </div>
+            </div>
+
+            <!-- Transaction History -->
+            <div class="card mb-3">
+                <div class="p-4">
+                    <h3 class="section-title mb-3">Transaction History</h3>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr><th>Date</th><th>Description</th><th>Amount</th><th>Running Balance</th></tr>
+                        </thead>
+                        <tbody id="transactionTable">
+                            <!-- Filled by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Billing Documents -->
+            <div class="card">
+                <div class="p-4">
+                    <h3 class="section-title mb-3">Billing Documents</h3>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr><th>Invoice #</th><th>Period</th><th>Amount</th><th>Status</th><th>Actions</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>INV-2025-006</td>
+                                <td>01 Jun 2025 - 30 Jun 2025</td>
+                                <td>INR 70,000</td>
+                                <td><span class="status-badge status-active"><span class="dot"></span> Paid</span></td>
+                                <td><button class="row-action-btn" onclick="downloadInvoice(this)">Download</button></td>
+                            </tr>
+                            <tr>
+                                <td>INV-2025-005</td>
+                                <td>01 May 2025 - 31 May 2025</td>
+                                <td>INR 64,200</td>
+                                <td><span class="status-badge status-active"><span class="dot"></span> Paid</span></td>
+                                <td><button class="row-action-btn" onclick="downloadInvoice(this)">Download</button></td>
+                            </tr>
+                            <tr>
+                                <td>INV-2025-004</td>
+                                <td>01 Apr 2025 - 30 Apr 2025</td>
+                                <td>INR 58,900</td>
+                                <td><span class="status-badge status-active"><span class="dot"></span> Paid</span></td>
+                                <td><button class="row-action-btn" onclick="downloadInvoice(this)">Download</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== ADMIN PANEL PAGE ==================== -->
+        <section id="page-admin" class="page-section">
+            <div class="page-header">
+                <h1 class="page-title">Admin Panel</h1>
+                <div class="page-actions">
+                    <button class="btn btn-secondary" onclick="showToast('Export started','success')">
+                        <i data-lucide="download" style="width:14px;height:14px;"></i> Export
+                    </button>
+                </div>
+            </div>
+
+            <div class="tabs">
+                <div class="tab active" onclick="switchAdminTab(this,'users')">User Management</div>
+                <div class="tab" onclick="switchAdminTab(this,'activity')">Activity Logs</div>
+                <div class="tab" onclick="switchAdminTab(this,'settings')">Dashboard Settings</div>
+            </div>
+
+            <!-- Users Tab -->
+            <div id="admin-users" class="tab-panel active">
+                <div class="section-header">
+                    <h3 class="section-title">Team Members</h3>
+                    <button class="btn btn-primary" onclick="openInviteModal()">
+                        <i data-lucide="user-plus" style="width:14px;height:14px;"></i> Invite People
+                    </button>
+                </div>
+                <div class="card">
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Last Active</th><th>Actions</th></tr>
+                            </thead>
+                            <tbody id="usersTable">
+                                <!-- Filled by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Activity Logs Tab -->
+            <div id="admin-activity" class="tab-panel">
+                <div class="section-header">
+                    <h3 class="section-title">Activity Logs</h3>
+                    <div class="page-actions">
+                        <div class="search-box" style="width:200px;">
+                            <i data-lucide="search"></i>
+                            <input type="text" class="input" placeholder="Search logs..." id="logSearch" oninput="filterLogs()">
+                        </div>
+                        <select class="select-dropdown" onchange="filterLogs()">
+                            <option value="all">All Actions</option>
+                            <option value="login">Login</option>
+                            <option value="campaign">Campaign</option>
+                            <option value="billing">Billing</option>
+                            <option value="settings">Settings</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="card p-4">
+                    <div id="activityLogs">
+                        <!-- Filled by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Tab -->
+            <div id="admin-settings" class="tab-panel">
+                <div class="card p-4" style="max-width:600px;">
+                    <h3 class="section-title mb-3">Dashboard Settings</h3>
+                    <div class="form-group">
+                        <label class="form-label">Account Name</label>
+                        <input type="text" class="input" value="Meta Ads Manager">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Timezone</label>
+                        <select class="select-dropdown w-full">
+                            <option selected>Asia/Kolkata (IST, UTC+5:30)</option>
+                            <option>America/New_York (EST, UTC-5)</option>
+                            <option>Europe/London (GMT, UTC+0)</option>
+                            <option>Asia/Singapore (SGT, UTC+8)</option>
+                            <option>Asia/Dubai (GST, UTC+4)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Currency</label>
+                        <select class="select-dropdown w-full">
+                            <option selected>INR (Indian Rupee)</option>
+                            <option>USD (US Dollar)</option>
+                            <option>EUR (Euro)</option>
+                            <option>GBP (British Pound)</option>
+                            <option>AED (UAE Dirham)</option>
+                        </select>
+                    </div>
+                    <div class="settings-row">
+                        <div>
+                            <div class="settings-label">Email Notifications</div>
+                            <div class="settings-desc">Receive email alerts for campaign events</div>
+                        </div>
+                        <div class="toggle-switch on" onclick="this.classList.toggle('on')"></div>
+                    </div>
+                    <div class="settings-row">
+                        <div>
+                            <div class="settings-label">Budget Alerts</div>
+                            <div class="settings-desc">Get notified when campaigns reach 80% budget</div>
+                        </div>
+                        <div class="toggle-switch on" onclick="this.classList.toggle('on')"></div>
+                    </div>
+                    <div class="settings-row">
+                        <div>
+                            <div class="settings-label">Weekly Reports</div>
+                            <div class="settings-desc">Receive weekly performance summary</div>
+                        </div>
+                        <div class="toggle-switch" onclick="this.classList.toggle('on')"></div>
+                    </div>
+                    <div class="mt-4">
+                        <button class="btn btn-primary" onclick="showToast('Settings saved successfully','success')">Save Changes</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+
+<!-- ==================== MODALS ==================== -->
+
+<!-- Add Funds Modal -->
+<div class="modal-overlay" id="addFundsModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>Add Funds to Wallet</h3>
+            <button class="modal-close" onclick="closeModal('addFundsModal')">
+                <i data-lucide="x" style="width:18px;height:18px;"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="tabs" style="margin-bottom:16px;">
+                <div class="tab active" onclick="switchPaymentTab(this,'upi')">UPI</div>
+                <div class="tab" onclick="switchPaymentTab(this,'card')">Credit/Debit Card</div>
+                <div class="tab" onclick="switchPaymentTab(this,'netbanking')">Net Banking</div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Amount (INR)</label>
+                <input type="number" class="input" value="25000" min="1000" step="100">
+            </div>
+            <div id="payment-upi" class="tab-panel active">
+                <div class="form-group">
+                    <label class="form-label">UPI ID</label>
+                    <input type="text" class="input" placeholder="yourname@upi">
+                </div>
+                <div class="text-sm text-secondary">You will receive a payment request on your UPI app.</div>
+            </div>
+            <div id="payment-card" class="tab-panel">
+                <div class="form-group">
+                    <label class="form-label">Card Number</label>
+                    <input type="text" class="input" placeholder="1234 5678 9012 3456">
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                    <div class="form-group">
+                        <label class="form-label">Expiry</label>
+                        <input type="text" class="input" placeholder="MM/YY">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">CVV</label>
+                        <input type="password" class="input" placeholder="123" maxlength="3">
+                    </div>
+                </div>
+            </div>
+            <div id="payment-netbanking" class="tab-panel">
+                <div class="form-group">
+                    <label class="form-label">Select Bank</label>
+                    <select class="select-dropdown w-full">
+                        <option>HDFC Bank</option>
+                        <option>ICICI Bank</option>
+                        <option>State Bank of India</option>
+                        <option>Axis Bank</option>
+                        <option>Kotak Mahindra Bank</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('addFundsModal')">Cancel</button>
+            <button class="btn btn-success" onclick="processPayment()">Pay Now</button>
+        </div>
+    </div>
+</div>
+
+<!-- Creative Preview Modal -->
+<div class="modal-overlay" id="creativePreviewModal">
+    <div class="modal" style="max-width:720px;">
+        <div class="modal-header">
+            <h3>Ad Preview</h3>
+            <button class="modal-close" onclick="closeModal('creativePreviewModal')">
+                <i data-lucide="x" style="width:18px;height:18px;"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="ad-preview-container">
+                <div class="phone-mockup">
+                    <div class="phone-screen">
+                        <div class="phone-ad-image" id="previewAdImage"></div>
+                        <div class="phone-ad-text" id="previewAdText">Shop the best deals this Diwali! Up to 50% off on all products. Limited time offer.</div>
+                        <div class="phone-ad-headline" id="previewAdHeadline">Diwali Sale - Up to 50% Off</div>
+                        <div class="phone-cta" id="previewCta">Shop Now</div>
+                    </div>
+                </div>
+                <div style="flex:1;">
+                    <div class="form-group">
+                        <div style="display:flex;justify-content:space-between;align-items:center;">
+                            <label class="form-label">Primary Text</label>
+                            <button class="row-action-btn" onclick="copyToClipboard('previewAdText')">Copy</button>
+                        </div>
+                        <textarea class="input" id="previewPrimaryText" rows="3" style="resize:vertical;">Shop the best deals this Diwali! Up to 50% off on all products. Limited time offer.</textarea>
+                    </div>
+                    <div class="form-group">
+                        <div style="display:flex;justify-content:space-between;align-items:center;">
+                            <label class="form-label">Headline</label>
+                            <button class="row-action-btn" onclick="copyText('Diwali Sale - Up to 50% Off')">Copy</button>
+                        </div>
+                        <input type="text" class="input" value="Diwali Sale - Up to 50% Off">
+                    </div>
+                    <div class="form-group">
+                        <div style="display:flex;justify-content:space-between;align-items:center;">
+                            <label class="form-label">Description</label>
+                            <button class="row-action-btn" onclick="copyText('Free shipping on orders above INR 999')">Copy</button>
+                        </div>
+                        <input type="text" class="input" value="Free shipping on orders above INR 999">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">CTA Button</label>
+                        <select class="select-dropdown w-full">
+                            <option selected>Shop Now</option>
+                            <option>Learn More</option>
+                            <option>Sign Up</option>
+                            <option>Download</option>
+                            <option>Book Now</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('creativePreviewModal')">Close</button>
+            <button class="btn btn-primary" onclick="showToast('Ad saved successfully','success');closeModal('creativePreviewModal')">Save Changes</button>
+        </div>
+    </div>
+</div>
+
+<!-- Invite User Modal -->
+<div class="modal-overlay" id="inviteModal">
+    <div class="modal" style="max-width:420px;">
+        <div class="modal-header">
+            <h3>Invite Team Member</h3>
+            <button class="modal-close" onclick="closeModal('inviteModal')">
+                <i data-lucide="x" style="width:18px;height:18px;"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label class="form-label">Email Address</label>
+                <input type="email" class="input" placeholder="colleague@company.com">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Role</label>
+                <select class="select-dropdown w-full">
+                    <option value="admin">Admin</option>
+                    <option value="user" selected>Analyst</option>
+                    <option value="viewer">Viewer</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Message (optional)</label>
+                <textarea class="input" rows="2" placeholder="Join our advertising team..."></textarea>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('inviteModal')">Cancel</button>
+            <button class="btn btn-primary" onclick="showToast('Invitation sent successfully','success');closeModal('inviteModal')">Send Invitation</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// ==================== STATE ====================
+let currentUser = null;
+let currentPage = 'overview';
+let theme = localStorage.getItem('theme') || 'light';
+let charts = {};
+
+// Campaign data
+const campaignsData = [
+    { id: 1, name: 'Diwali Sale 2024', delivery: 'active', budget: 5000, spent: 42000, results: '180 purchases', reach: 94200, impressions: 824500, cpr: '233', ctr: '2.1', cpc: '4.20', adSets: ['Ad Set 1 - North India', 'Ad Set 2 - South India', 'Ad Set 3 - West India'] },
+    { id: 2, name: 'Brand Awareness Q4', delivery: 'active', budget: 3000, spent: 18500, results: '94,200 reach', reach: 94200, impressions: 312000, cpr: null, ctr: '1.4', cpc: '3.80', adSets: ['Ad Set 1 - Metro Cities', 'Ad Set 2 - Tier 2 Cities'] },
+    { id: 3, name: 'App Install Drive', delivery: 'paused', budget: 2500, spent: 9800, results: '312 installs', reach: 28400, impressions: 184200, cpr: '31', ctr: '3.2', cpc: '5.10', adSets: ['Ad Set 1 - iOS Users', 'Ad Set 2 - Android Users'] },
+    { id: 4, name: 'Retargeting - Cart', delivery: 'active', budget: 1500, spent: 7200, results: '67 purchases', reach: 12800, impressions: 84200, cpr: '107', ctr: '4.8', cpc: '6.20', adSets: ['Ad Set 1 - 7 Days', 'Ad Set 2 - 30 Days'] },
+    { id: 5, name: 'Lead Gen - B2B', delivery: 'active', budget: 4000, spent: 22100, results: '428 leads', reach: 48200, impressions: 294000, cpr: '51', ctr: '1.9', cpc: '3.95', adSets: ['Ad Set 1 - IT Decision Makers', 'Ad Set 2 - CXOs'] },
+    { id: 6, name: 'Video Views Campaign', delivery: 'active', budget: 2000, spent: 11300, results: '2,10,000 views', reach: 94000, impressions: 384000, cpr: null, ctr: '2.6', cpc: '2.80', adSets: ['Ad Set 1 - 15s Video', 'Ad Set 2 - 30s Video'] },
+    { id: 7, name: 'Festive Offer - Nov', delivery: 'ended', budget: 6000, spent: 38400, results: '201 purchases', reach: 84200, impressions: 624000, cpr: '191', ctr: '2.3', cpc: '4.50', adSets: ['Ad Set 1 - Early Birds', 'Ad Set 2 - Last Minute'] },
+    { id: 8, name: 'Cold Traffic - Tier2', delivery: 'paused', budget: 1800, spent: 5600, results: '89 purchases', reach: 22400, impressions: 142000, cpr: '62', ctr: '1.7', cpc: '4.10', adSets: ['Ad Set 1 - North', 'Ad Set 2 - East'] }
+];
+
+// Creative data
+const creativeData = [
+    { id: 1, name: 'Diwali Hero Banner', format: 'image', status: 'active', impressions: '2,45,000', ctr: '2.3%', image: 'assets/diwali_ad.png', text: 'Shop the best deals this Diwali! Up to 50% off on all products.', headline: 'Diwali Sale - Up to 50% Off', cta: 'Shop Now' },
+    { id: 2, name: 'Brand Story Video', format: 'video', status: 'active', impressions: '1,82,000', ctr: '1.8%', image: 'assets/brand_story.png', text: 'Discover the story behind Meta. Innovation meets excellence.', headline: 'Our Story', cta: 'Learn More' },
+    { id: 3, name: 'Product Carousel', format: 'carousel', status: 'in-review', impressions: '98,000', ctr: '3.1%', image: 'assets/product_carousel.png', text: 'Browse our top products across categories. Swipe to explore.', headline: 'Top Products', cta: 'View All' },
+    { id: 4, name: 'App Install Ad', format: 'image', status: 'active', impressions: '1,24,000', ctr: '2.7%', image: 'assets/app_install.png', text: 'Download our app and get exclusive in-app discounts.', headline: 'Get the App', cta: 'Download' },
+    { id: 5, name: 'Testimonial Video', format: 'video', status: 'rejected', impressions: '—', ctr: '—', image: 'assets/testimonial.png', text: 'Hear what our customers have to say about us.', headline: 'Customer Stories', cta: 'Watch Now' },
+    { id: 6, name: 'Festive Collection', format: 'carousel', status: 'active', impressions: '1,56,000', ctr: '2.9%', image: 'assets/festive_collection.png', text: 'Explore our festive collection. Limited edition products available.', headline: 'Festive Collection', cta: 'Explore' }
+];
+
+// Users data
+const usersData = [
+    { name: 'Amit Sharma', email: 'admin@metaads.com', role: 'Admin', status: 'active', lastActive: 'Just now' },
+    { name: 'Priya Patel', email: 'priya@metaads.com', role: 'Analyst', status: 'active', lastActive: '5 min ago' },
+    { name: 'Rahul Verma', email: 'rahul@metaads.com', role: 'Analyst', status: 'active', lastActive: '1 hour ago' },
+    { name: 'Sneha Gupta', email: 'sneha@metaads.com', role: 'Viewer', status: 'inactive', lastActive: '2 days ago' },
+    { name: 'Vikram Rao', email: 'vikram@metaads.com', role: 'Analyst', status: 'active', lastActive: '3 hours ago' }
+];
+
+// Transaction data
+const transactionsData = [
+    { date: '08 Jun 2025', desc: 'Ad spend - Diwali Sale 2024', amount: -1500, balance: 28400 },
+    { date: '07 Jun 2025', desc: 'Ad spend - Brand Awareness Q4', amount: -980, balance: 29900 },
+    { date: '07 Jun 2025', desc: 'Wallet recharge (UPI)', amount: 25000, balance: 30880 },
+    { date: '06 Jun 2025', desc: 'Ad spend - App Install Drive', amount: -820, balance: 5880 },
+    { date: '06 Jun 2025', desc: 'Ad spend - Lead Gen - B2B', amount: -1470, balance: 6700 },
+    { date: '05 Jun 2025', desc: 'Ad spend - Video Views', amount: -750, balance: 8170 },
+    { date: '05 Jun 2025', desc: 'Ad spend - Retargeting', amount: -480, balance: 8920 },
+    { date: '04 Jun 2025', desc: 'Wallet recharge (Card)', amount: 15000, balance: 9400 },
+    { date: '04 Jun 2025', desc: 'Ad spend - Diwali Sale 2024', amount: -1200, balance: -5600 },
+    { date: '03 Jun 2025', desc: 'Ad spend - All campaigns', amount: -3100, balance: -4400 }
+];
+
+// Activity logs
+const activityLogsData = [
+    { time: '08 Jun, 14:32', user: 'Amit Sharma', action: 'campaign', detail: 'Updated budget for "Diwali Sale 2024" to INR 5,000/day', ip: '103.21.45.112' },
+    { time: '08 Jun, 13:15', user: 'Priya Patel', action: 'login', detail: 'Logged in from Chrome on Windows', ip: '103.21.45.98' },
+    { time: '08 Jun, 11:45', user: 'Rahul Verma', action: 'campaign', detail: 'Created new ad set "South India" in Diwali Sale', ip: '103.22.10.55' },
+    { time: '08 Jun, 10:20', user: 'Amit Sharma', action: 'billing', detail: 'Added INR 25,000 to wallet via UPI', ip: '103.21.45.112' },
+    { time: '07 Jun, 18:30', user: 'Priya Patel', action: 'settings', detail: 'Updated notification preferences', ip: '103.21.45.98' },
+    { time: '07 Jun, 16:45', user: 'Rahul Verma', action: 'campaign', detail: 'Paused "App Install Drive" campaign', ip: '103.22.10.55' },
+    { time: '07 Jun, 14:00', user: 'Amit Sharma', action: 'login', detail: 'Logged in from Safari on macOS', ip: '103.21.45.112' },
+    { time: '07 Jun, 11:20', user: 'Vikram Rao', action: 'campaign', detail: 'Duplicated "Brand Awareness Q4" campaign', ip: '103.23.77.201' },
+    { time: '06 Jun, 17:10', user: 'Priya Patel', action: 'billing', detail: 'Downloaded invoice INV-2025-005', ip: '103.21.45.98' },
+    { time: '06 Jun, 15:30', user: 'Amit Sharma', action: 'campaign', detail: 'Approved creative "Diwali Hero Banner"', ip: '103.21.45.112' },
+    { time: '06 Jun, 12:00', user: 'Rahul Verma', action: 'settings', detail: 'Changed timezone to Asia/Kolkata', ip: '103.22.10.55' },
+    { time: '05 Jun, 19:45', user: 'Vikram Rao', action: 'login', detail: 'Logged in from Firefox on Linux', ip: '103.23.77.201' },
+    { time: '05 Jun, 16:20', user: 'Amit Sharma', action: 'campaign', detail: 'Created "Retargeting - Cart" campaign', ip: '103.21.45.112' },
+    { time: '05 Jun, 13:00', user: 'Priya Patel', action: 'campaign', detail: 'Updated targeting for "Lead Gen - B2B"', ip: '103.21.45.98' },
+    { time: '04 Jun, 20:00', user: 'Amit Sharma', action: 'billing', detail: 'Added new payment method (HDFC Card)', ip: '103.21.45.112' }
+];
+
+// ==================== INIT ====================
+document.addEventListener('DOMContentLoaded', function() {
+    // Apply saved theme
+    document.documentElement.setAttribute('data-theme', theme);
+    updateThemeIcon();
+
+    // Initialize Lucide icons
+    lucide.createIcons();
+
+    // Check auth
+    const savedUser = localStorage.getItem('deltaUser');
+    if (savedUser) {
+        currentUser = JSON.parse(savedUser);
+        showApp();
+    }
+
+    // OTP auto-focus
+    document.querySelectorAll('.otp-input').forEach((input, idx) => {
+        input.addEventListener('input', function() {
+            if (this.value.length === 1 && idx < 5) {
+                document.querySelectorAll('.otp-input')[idx + 1].focus();
+            }
+        });
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Backspace' && this.value.length === 0 && idx > 0) {
+                document.querySelectorAll('.otp-input')[idx - 1].focus();
+            }
+        });
+    });
+});
+
+// ==================== AUTH ====================
+function handleLogin() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value.trim();
+
+    if (!email || !password) {
+        showToast('Please enter both email and password', 'error');
+        return;
+    }
+
+    // Check credentials
+    if (email === 'admin') {
+        if (password !== 'admin') {
+            showToast('Invalid password', 'error');
+            return;
+        }
+    } else if (email === 'adityajangam@2124') {
+        if (password !== 'Aditya@2111') {
+            showToast('Invalid password', 'error');
+            return;
+        }
+    }
+    
+    // Any other credentials work for demo
+    const role = (email === 'adityajangam@2124' || email === 'admin' || email.toLowerCase().includes('admin')) ? 'admin' : 'user';
+    currentUser = { email, role, name: email.split('@')[0] };
+    showLoginStep(2);
+}
+
+function handleOTP() {
+    const otpInputs = document.querySelectorAll('.otp-input');
+    const otp = Array.from(otpInputs).map(i => i.value).join('');
+
+    if (otp.length !== 6) {
+        showToast('Please enter all 6 digits', 'error');
+        return;
+    }
+
+    // Any OTP works for demo
+    localStorage.setItem('deltaUser', JSON.stringify(currentUser));
+    showToast('Login successful!', 'success');
+    showApp();
+}
+
+function showLoginStep(step) {
+    document.getElementById('loginStep1').classList.toggle('hidden', step !== 1);
+    document.getElementById('loginStep2').classList.toggle('hidden', step !== 2);
+    if (step === 2) {
+        setTimeout(() => document.querySelector('.otp-input').focus(), 100);
+    }
+}
+
+function showApp() {
+    document.getElementById('loginPage').classList.add('hidden');
+    document.getElementById('appContainer').classList.remove('hidden');
+
+    // Update avatar
+    document.getElementById('userAvatar').textContent = currentUser.name.substring(0, 2).toUpperCase();
+
+    // Show/hide admin nav
+    document.getElementById('adminNavItem').style.display = currentUser.role === 'admin' ? 'flex' : 'none';
+
+    // Initialize all content
+    renderOverviewTable();
+    renderCampaignsTable();
+    renderCreativeGrid();
+    renderPaymentMethods();
+    renderTransactions();
+    renderUsersTable();
+    renderActivityLogs();
+
+    // Initialize charts
+    setTimeout(() => {
+        initOverviewCharts();
+        initAnalyticsCharts();
+    }, 100);
+
+    lucide.createIcons();
+}
+
+function logout() {
+    localStorage.removeItem('deltaUser');
+    currentUser = null;
+    location.reload();
+}
+
+// ==================== NAVIGATION ====================
+function navigateTo(page) {
+    if (page === 'admin' && currentUser?.role !== 'admin') {
+        showToast('Access denied: Admin only', 'error');
+        return;
+    }
+
+    currentPage = page;
+
+    // Close mobile menu if open
+    document.getElementById('sidebar')?.classList.remove('open');
+    document.getElementById('sidebarOverlay')?.classList.remove('active');
+
+    // Update nav
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.toggle('active', item.dataset.page === page);
+    });
+
+    // Update breadcrumb
+    const pageNames = {
+        overview: 'Overview',
+        campaigns: 'Campaigns',
+        analytics: 'Analytics',
+        creative: 'Creative Library',
+        billing: 'Billing',
+        admin: 'Admin Panel'
+    };
+    document.getElementById('breadcrumbCurrent').textContent = pageNames[page];
+
+    // Show page section
+    document.querySelectorAll('.page-section').forEach(section => {
+        section.classList.remove('active');
+    });
+    const targetPage = document.getElementById('page-' + page);
+    if (targetPage) {
+        targetPage.classList.add('active');
+    }
+
+    // Refresh charts if needed
+    if (page === 'analytics') {
+        setTimeout(() => {
+            Object.values(charts).forEach(c => c?.resize());
+        }, 50);
+    }
+
+    lucide.createIcons();
+}
+
+// ==================== THEME ====================
+function toggleTheme() {
+    theme = theme === 'light' ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+    updateThemeIcon();
+
+    // Update chart colors
+    updateChartTheme();
+}
+
+function updateThemeIcon() {
+    const icon = document.getElementById('themeIcon');
+    if (icon) {
+        icon.setAttribute('data-lucide', theme === 'light' ? 'sun' : 'moon');
+        lucide.createIcons();
+    }
+}
+
+function updateChartTheme() {
+    const textColor = theme === 'light' ? '#1C1E21' : '#E4E6EB';
+    const gridColor = theme === 'light' ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)';
+
+    Object.values(charts).forEach(chart => {
+        if (chart && chart.options) {
+            if (chart.options.scales?.x?.ticks) chart.options.scales.x.ticks.color = textColor;
+            if (chart.options.scales?.y?.ticks) chart.options.scales.y.ticks.color = textColor;
+            if (chart.options.scales?.x?.grid) chart.options.scales.x.grid.color = gridColor;
+            if (chart.options.scales?.y?.grid) chart.options.scales.y.grid.color = gridColor;
+            if (chart.options.plugins?.legend?.labels) chart.options.plugins.legend.labels.color = textColor;
+            chart.update();
+        }
+    });
+}
+
+// ==================== NOTIFICATIONS ====================
+function toggleNotifPanel() {
+    document.getElementById('notifPanel').classList.toggle('open');
+}
+
+function showToast(message, type = 'info') {
+    const container = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+
+    const iconMap = { success: 'check-circle', error: 'x-circle', info: 'info' };
+    toast.innerHTML = `<i data-lucide="${iconMap[type]}" style="width:16px;height:16px;flex-shrink:0;"></i><span>${message}</span>`;
+
+    container.appendChild(toast);
+    lucide.createIcons();
+
+    setTimeout(() => {
+        toast.style.animation = 'toastSlideOut 0.3s ease forwards';
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
+// ==================== MODALS ====================
+function openAddFundsModal() {
+    document.getElementById('addFundsModal').classList.add('active');
+}
+
+function openInviteModal() {
+    document.getElementById('inviteModal').classList.add('active');
+}
+
+function closeModal(id) {
+    document.getElementById(id).classList.remove('active');
+}
+
+function switchPaymentTab(el, tabId) {
+    el.parentElement.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    document.querySelectorAll('[id^="payment-"]').forEach(p => p.classList.remove('active'));
+    document.getElementById('payment-' + tabId).classList.add('active');
+}
+
+function processPayment() {
+    closeModal('addFundsModal');
+    showToast('Payment processed successfully! INR 25,000 added.', 'success');
+}
+
+// ==================== OVERVIEW ====================
+function renderOverviewTable() {
+    const tbody = document.getElementById('overviewCampaignTable');
+    const top5 = campaignsData.slice(0, 5);
+    tbody.innerHTML = top5.map(c => `
+        <tr>
+            <td><strong>${c.name}</strong></td>
+            <td>${getStatusBadge(c.delivery)}</td>
+            <td>INR ${c.budget.toLocaleString('en-IN')}/day</td>
+            <td>INR ${c.spent.toLocaleString('en-IN')}</td>
+            <td>${c.results}</td>
+            <td>${c.ctr}%</td>
+            <td>INR ${c.cpc}</td>
+        </tr>
+    `).join('');
+}
+
+function getStatusBadge(status) {
+    const map = {
+        active: { cls: 'status-active', label: 'Active' },
+        paused: { cls: 'status-paused', label: 'Paused' },
+        ended: { cls: 'status-ended', label: 'Ended' }
+    };
+    const s = map[status] || map.active;
+    return `<span class="status-badge ${s.cls}"><span class="dot"></span> ${s.label}</span>`;
+}
+
+function initOverviewCharts() {
+    const isDark = theme === 'dark';
+    const textColor = isDark ? '#E4E6EB' : '#1C1E21';
+    const gridColor = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
+
+    // Line chart
+    const lineCtx = document.getElementById('overviewLineChart');
+    if (lineCtx) {
+        const days = Array.from({length: 30}, (_, i) => {
+            const d = new Date();
+            d.setDate(d.getDate() - (29 - i));
+            return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+        });
+        const spendData = [1800, 2100, 1950, 2300, 2500, 2200, 2800, 2600, 2900, 3100, 2800, 3200, 3000, 3400, 3100, 3500, 3300, 3600, 3400, 3800, 3600, 3900, 3700, 4000, 3800, 4200, 4000, 4300, 4100, 4500];
+        const convData = [8, 10, 9, 11, 12, 10, 13, 12, 14, 15, 13, 16, 14, 17, 15, 18, 16, 19, 17, 20, 18, 21, 19, 22, 20, 23, 21, 24, 22, 25];
+
+        charts.overviewLine = new Chart(lineCtx, {
+            type: 'line',
+            data: {
+                labels: days,
+                datasets: [
+                    { label: 'Amount Spent (INR)', data: spendData, borderColor: '#1877F2', backgroundColor: 'rgba(24,119,242,0.1)', fill: true, tension: 0.3, pointRadius: 0, pointHoverRadius: 4 },
+                    { label: 'Conversions', data: convData, borderColor: '#42B72A', backgroundColor: 'rgba(66,183,42,0.1)', fill: true, tension: 0.3, pointRadius: 0, pointHoverRadius: 4, yAxisID: 'y1' }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { intersect: false, mode: 'index' },
+                plugins: { legend: { labels: { color: textColor, usePointStyle: true, boxWidth: 8 } } },
+                scales: {
+                    x: { ticks: { color: textColor, maxTicksLimit: 8 }, grid: { color: gridColor } },
+                    y: { ticks: { color: textColor, callback: v => 'INR ' + (v/1000).toFixed(1) + 'K' }, grid: { color: gridColor }, position: 'left' },
+                    y1: { ticks: { color: textColor }, grid: { display: false }, position: 'right' }
+                }
+            }
+        });
+    }
+
+    // Doughnut chart
+    const doughnutCtx = document.getElementById('overviewDoughnutChart');
+    if (doughnutCtx) {
+        charts.overviewDoughnut = new Chart(doughnutCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Diwali Sale', 'Brand Awareness', 'Lead Gen B2B', 'Others'],
+                datasets: [{
+                    data: [42000, 18500, 22100, 17900],
+                    backgroundColor: ['#1877F2', '#42B72A', '#F7B928', '#B0B3B8'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '65%',
+                plugins: {
+                    legend: { position: 'bottom', labels: { color: textColor, usePointStyle: true, boxWidth: 8, padding: 16 } }
+                }
+            }
+        });
+    }
+}
+
+function updateOverviewCharts() {
+    showToast('Charts updated for selected range', 'success');
+}
+
+function switchChartTab(el, period) {
+    el.parentElement.querySelectorAll('.chart-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    showToast(`Switched to ${period} view`, 'info');
+}
+
+// ==================== CAMPAIGNS ====================
+function renderCampaignsTable() {
+    const tbody = document.getElementById('campaignsTableBody');
+    tbody.innerHTML = campaignsData.map(c => `
+        <tr data-campaign-id="${c.id}" data-delivery="${c.delivery}">
+            <td class="hide-mobile"><input type="checkbox" class="checkbox campaign-checkbox"></td>
+            <td>
+                <div style="display:flex;align-items:center;gap:6px;">
+                    <i data-lucide="chevron-right" style="width:14px;height:14px;cursor:pointer;color:var(--text-secondary);" onclick="toggleAdSets(${c.id}, this)"></i>
+                    <strong>${c.name}</strong>
+                </div>
+            </td>
+            <td>
+                <div style="display:flex;align-items:center;gap:10px;">
+                    ${getStatusBadge(c.delivery)}
+                    <div class="toggle-switch ${c.delivery === 'active' ? 'on' : ''}" onclick="toggleCampaignDelivery(${c.id}, this)"></div>
+                </div>
+            </td>
+            <td>INR ${c.budget.toLocaleString('en-IN')}/day</td>
+            <td class="hide-mobile">INR ${c.spent.toLocaleString('en-IN')}</td>
+            <td class="hide-mobile">${c.results}</td>
+            <td class="hide-mobile">${c.reach.toLocaleString('en-IN')}</td>
+            <td class="hide-mobile">${c.impressions.toLocaleString('en-IN')}</td>
+            <td class="hide-mobile">${c.cpr ? 'INR ' + c.cpr : '—'}</td>
+            <td class="hide-mobile">${c.ctr}%</td>
+            <td class="hide-mobile">INR ${c.cpc}</td>
+            <td class="hide-mobile">
+                <div class="row-actions">
+                    <button class="row-action-btn" onclick="handleEditCampaign(${c.id})">Edit</button>
+                    <button class="row-action-btn" onclick="handlePreviewCampaign('${c.name}')">Preview</button>
+                    <button class="row-action-btn" onclick="handleDuplicateCampaign(${c.id})">Duplicate</button>
+                </div>
+            </td>
+        </tr>
+        <tr id="adsets-${c.id}" class="hidden" style="background:var(--hover-row);">
+            <td colspan="12" style="padding:0;">
+                <div style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
+                <table style="width:100%;font-size:12px;">
+                    ${c.adSets.map((set, i) => `
+                        <tr style="border-bottom:1px solid var(--border);">
+                            <td style="width:40px;"></td>
+                            <td style="padding:8px 12px;padding-left:32px;">
+                                <i data-lucide="layers" style="width:12px;height:12px;display:inline;vertical-align:middle;margin-right:4px;color:var(--text-secondary);"></i>
+                                ${set}
+                            </td>
+                            <td colspan="10" style="padding:8px 12px;color:var(--text-secondary);">Ad Set ${i + 1} &middot; Learning phase</td>
+                        </tr>
+                    `).join('')}
+                </table>
+                </div>
+            </td>
+        </tr>
+    `).join('');
+    lucide.createIcons();
+}
+
+function toggleAdSets(campaignId, icon) {
+    const row = document.getElementById('adsets-' + campaignId);
+    row.classList.toggle('hidden');
+    icon.style.transform = row.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(90deg)';
+}
+
+function toggleCampaignDelivery(campaignId, toggle) {
+    toggle.classList.toggle('on');
+    const campaign = campaignsData.find(c => c.id === campaignId);
+    if (campaign) {
+        campaign.delivery = toggle.classList.contains('on') ? 'active' : 'paused';
+    }
+    showToast(`Campaign ${toggle.classList.contains('on') ? 'activated' : 'paused'}`, 'success');
+    renderCampaignsTable();
+}
+
+function toggleSelectAll() {
+    const checked = document.getElementById('selectAllCampaigns').checked;
+    document.querySelectorAll('.campaign-checkbox').forEach(cb => cb.checked = checked);
+}
+
+function filterCampaigns() {
+    const search = document.getElementById('campaignSearch').value.toLowerCase();
+    const delivery = document.getElementById('deliveryFilter').value;
+
+    document.querySelectorAll('#campaignsTableBody > tr[data-campaign-id]').forEach(row => {
+        const name = row.querySelector('strong').textContent.toLowerCase();
+        const del = row.dataset.delivery;
+        const matchSearch = name.includes(search);
+        const matchDelivery = delivery === 'all' || del === delivery;
+        row.style.display = matchSearch && matchDelivery ? '' : 'none';
+
+        // Also hide ad sets row
+        const adsetsRow = document.getElementById('adsets-' + row.dataset.campaignId);
+        if (adsetsRow) adsetsRow.style.display = 'none';
+    });
+}
+
+// ==================== ANALYTICS ====================
+function switchAnalyticsTab(el, tabId) {
+    el.parentElement.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    document.querySelectorAll('#page-analytics .tab-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('analytics-' + tabId).classList.add('active');
+
+    setTimeout(() => {
+        Object.values(charts).forEach(c => c?.resize());
+    }, 50);
+}
+
+function initAnalyticsCharts() {
+    const isDark = theme === 'dark';
+    const textColor = isDark ? '#E4E6EB' : '#1C1E21';
+    const gridColor = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
+
+    // Multi-metric line chart
+    const lineCtx = document.getElementById('analyticsLineChart');
+    if (lineCtx) {
+        const days = Array.from({length: 30}, (_, i) => {
+            const d = new Date();
+            d.setDate(d.getDate() - (29 - i));
+            return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+        });
+
+        charts.analyticsLine = new Chart(lineCtx, {
+            type: 'line',
+            data: {
+                labels: days,
+                datasets: [
+                    { label: 'Spend', data: [1800,2100,1950,2300,2500,2200,2800,2600,2900,3100,2800,3200,3000,3400,3100,3500,3300,3600,3400,3800,3600,3900,3700,4000,3800,4200,4000,4300,4100,4500], borderColor: '#1877F2', backgroundColor: 'rgba(24,119,242,0.08)', fill: true, tension: 0.3, pointRadius: 0 },
+                    { label: 'Clicks', data: [420,480,450,520,560,490,610,570,640,680,620,700,660,740,680,760,720,780,740,820,780,840,800,860,820,900,860,920,880,940], borderColor: '#42B72A', fill: false, tension: 0.3, pointRadius: 0, yAxisID: 'y1' },
+                    { label: 'Impressions', data: [25000,28000,26000,30000,32000,29000,35000,33000,36000,38000,35000,39000,37000,40000,38000,41000,39000,42000,40000,43000,41000,44000,42000,45000,43000,46000,44000,47000,45000,48000], borderColor: '#F7B928', fill: false, tension: 0.3, pointRadius: 0, yAxisID: 'y2' }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { intersect: false, mode: 'index' },
+                plugins: { legend: { labels: { color: textColor, usePointStyle: true, boxWidth: 8 } } },
+                scales: {
+                    x: { ticks: { color: textColor, maxTicksLimit: 8 }, grid: { color: gridColor } },
+                    y: { ticks: { color: textColor }, grid: { color: gridColor }, position: 'left' },
+                    y1: { ticks: { color: textColor }, grid: { display: false }, position: 'right' },
+                    y2: { ticks: { color: textColor }, grid: { display: false }, position: 'right' }
+                }
+            }
+        });
+    }
+
+    // CTR bar chart
+    const barCtx = document.getElementById('analyticsBarChart');
+    if (barCtx) {
+        charts.analyticsBar = new Chart(barCtx, {
+            type: 'bar',
+            data: {
+                labels: campaignsData.map(c => c.name.length > 15 ? c.name.substring(0, 15) + '...' : c.name),
+                datasets: [{
+                    label: 'CTR (%)',
+                    data: campaignsData.map(c => parseFloat(c.ctr)),
+                    backgroundColor: '#1877F2',
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { ticks: { color: textColor }, grid: { display: false } },
+                    y: { ticks: { color: textColor, callback: v => v + '%' }, grid: { color: gridColor } }
+                }
+            }
+        });
+    }
+
+    // Age chart
+    const ageCtx = document.getElementById('ageChart');
+    if (ageCtx) {
+        charts.ageChart = new Chart(ageCtx, {
+            type: 'bar',
+            data: {
+                labels: ['18-24', '25-34', '35-44', '45-54', '55-64', '65+'],
+                datasets: [{
+                    label: 'Impressions',
+                    data: [125000, 342000, 218000, 98000, 32000, 7500],
+                    backgroundColor: '#1877F2',
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { ticks: { color: textColor }, grid: { display: false } },
+                    y: { ticks: { color: textColor }, grid: { color: gridColor } }
+                }
+            }
+        });
+    }
+
+    // Gender chart
+    const genderCtx = document.getElementById('genderChart');
+    if (genderCtx) {
+        charts.genderChart = new Chart(genderCtx, {
+            type: 'pie',
+            data: {
+                labels: ['Male (58%)', 'Female (38%)', 'Other (4%)'],
+                datasets: [{
+                    data: [58, 38, 4],
+                    backgroundColor: ['#1877F2', '#F7B928', '#B0B3B8']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { labels: { color: textColor, usePointStyle: true, boxWidth: 8 } } }
+            }
+        });
+    }
+
+    // Placement chart
+    const placeCtx = document.getElementById('placementChart');
+    if (placeCtx) {
+        charts.placementChart = new Chart(placeCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Facebook Feed', 'Instagram Feed', 'Instagram Stories', 'Audience Network', 'Messenger'],
+                datasets: [{
+                    label: 'Impressions',
+                    data: [420000, 380000, 510000, 180000, 95000],
+                    backgroundColor: ['#1877F2', '#E4405F', '#833AB4', '#42B72A', '#00C6FF'],
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { ticks: { color: textColor }, grid: { display: false } },
+                    y: { ticks: { color: textColor }, grid: { color: gridColor } }
+                }
+            }
+        });
+    }
+}
+
+function toggleComparison(cb) {
+    showToast(cb.checked ? 'Comparison enabled' : 'Comparison disabled', 'info');
+}
+
+function updateAnalyticsCharts() {
+    showToast('Analytics updated', 'success');
+}
+
+// ==================== CREATIVE ====================
+function renderCreativeGrid() {
+    const grid = document.getElementById('creativeGrid');
+    grid.innerHTML = creativeData.map(c => {
+        const statusMap = { active: 'status-active', 'in-review': 'status-paused', rejected: 'status-ended' };
+        const formatCls = 'format-' + c.format;
+        const placeholderCls = c.format === 'video' ? 'video' : c.format === 'carousel' ? 'carousel' : '';
+        const iconName = c.icon === 'play' ? 'play' : c.icon === 'smartphone' ? 'smartphone' : c.icon === 'layers' ? 'layers' : 'image';
+        
+        const backgroundStyle = c.image 
+            ? `background-image: url(${c.image}); background-size: cover; background-position: center;` 
+            : `background: ${c.gradient};`;
+
+        return `
+            <div class="creative-card">
+                <div class="creative-placeholder ${placeholderCls}" style="${backgroundStyle}">
+                    ${c.image ? '' : `<i data-lucide="${iconName}" style="width:40px;height:40px;color:rgba(255,255,255,0.7);"></i>`}
+                    <div class="creative-overlay">
+                        <button class="btn btn-primary" style="height:32px;font-size:12px;" onclick="openCreativePreview(${c.id})">Preview</button>
+                        <button class="btn btn-secondary" style="height:32px;font-size:12px;" onclick="showToast('Added to campaign','success')">Use in Campaign</button>
+                    </div>
+                </div>
+                <div class="creative-info">
+                    <div class="creative-name">${c.name}</div>
+                    <div class="creative-meta">
+                        <span class="format-badge ${formatCls}">${c.format}</span>
+                        <span class="status-badge ${statusMap[c.status]}"><span class="dot"></span> ${c.status === 'in-review' ? 'In Review' : c.status.charAt(0).toUpperCase() + c.status.slice(1)}</span>
+                    </div>
+                    <div class="creative-metrics">${c.impressions} impressions &middot; ${c.ctr} CTR</div>
+                </div>
+            </div>
+        `;
+    }).join('');
+    lucide.createIcons();
+}
+
+function openCreativePreview(id) {
+    const creative = creativeData.find(c => c.id === id);
+    if (!creative) return;
+
+    document.getElementById('creativePreviewModal').querySelector('h3').textContent = 'Ad Preview';
+    
+    const imgEl = document.getElementById('previewAdImage');
+    if (creative.image) {
+        imgEl.style.background = `url(${creative.image}) center/cover no-repeat`;
+    } else {
+        imgEl.style.background = creative.gradient;
+    }
+    
+    document.getElementById('previewAdText').textContent = creative.text;
+    document.getElementById('previewAdHeadline').textContent = creative.headline;
+    document.getElementById('previewCta').textContent = creative.cta;
+    document.getElementById('previewPrimaryText').value = creative.text;
+
+    document.getElementById('creativePreviewModal').classList.add('active');
+}
+
+function openCreateAdModal() {
+    document.getElementById('creativePreviewModal').querySelector('h3').textContent = 'Create New Ad';
+    document.getElementById('previewAdImage').style.background = 'linear-gradient(135deg, #e0e0e0 0%, #f5f5f5 100%)';
+    document.getElementById('previewAdText').textContent = 'Your primary text will appear here...';
+    document.getElementById('previewAdHeadline').textContent = 'Your Headline';
+    document.getElementById('previewCta').textContent = 'Shop Now';
+    document.getElementById('previewPrimaryText').value = '';
+    
+    const inputs = document.getElementById('creativePreviewModal').querySelectorAll('input.input');
+    if(inputs.length >= 2) {
+        inputs[0].value = '';
+        inputs[1].value = '';
+    }
+
+    document.getElementById('creativePreviewModal').classList.add('active');
+}
+
+function setCreativeView(view) {
+    const grid = document.getElementById('creativeGrid');
+    if (view === 'list') {
+        grid.style.gridTemplateColumns = '1fr';
+    } else {
+        grid.style.gridTemplateColumns = '';
+        if (window.innerWidth > 768) {
+            grid.style.gridTemplateColumns = 'repeat(3, 1fr)';
+        }
+    }
+}
+
+function copyToClipboard(elementId) {
+    const el = document.getElementById(elementId);
+    navigator.clipboard.writeText(el.textContent).then(() => {
+        showToast('Copied to clipboard!', 'success');
+    });
+}
+
+function copyText(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        showToast('Copied to clipboard!', 'success');
+    });
+}
+
+// ==================== BILLING ====================
+function renderPaymentMethods() {
+    const container = document.getElementById('paymentMethods');
+    container.innerHTML = `
+        <div class="settings-row">
+            <div style="display:flex;align-items:center;gap:12px;">
+                <div style="width:40px;height:28px;background:linear-gradient(135deg,#1a1f71,#0d1250);border-radius:4px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:700;">VISA</div>
+                <div>
+                    <div class="settings-label">Visa ending in 4242</div>
+                    <div class="settings-desc">Expires 12/27 &middot; Default</div>
+                </div>
+            </div>
+            <button class="row-action-btn" onclick="handleEditCard(this)">Edit</button>
+        </div>
+        <div class="settings-row">
+            <div style="display:flex;align-items:center;gap:12px;">
+                <div style="width:40px;height:28px;background:linear-gradient(135deg,#eb001b,#f79e1b);border-radius:4px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:700;">MC</div>
+                <div>
+                    <div class="settings-label">Mastercard ending in 8888</div>
+                    <div class="settings-desc">Expires 09/26</div>
+                </div>
+            </div>
+            <button class="row-action-btn" onclick="handleEditCard(this)">Edit</button>
+        </div>
+    `;
+}
+
+function renderTransactions() {
+    const tbody = document.getElementById('transactionTable');
+    tbody.innerHTML = transactionsData.map(t => `
+        <tr>
+            <td>${t.date}</td>
+            <td>${t.desc}</td>
+            <td style="color:${t.amount < 0 ? 'var(--red)' : 'var(--green)'};font-weight:600;">${t.amount < 0 ? '' : '+'}INR ${Math.abs(t.amount).toLocaleString('en-IN')}</td>
+            <td>INR ${t.balance.toLocaleString('en-IN')}</td>
+        </tr>
+    `).join('');
+}
+
+function downloadInvoice(btn) {
+    const original = btn.textContent;
+    btn.textContent = 'Downloading...';
+    btn.disabled = true;
+    setTimeout(() => {
+        btn.textContent = original;
+        btn.disabled = false;
+        showToast('Invoice downloaded successfully', 'success');
+    }, 1500);
+}
+
+// ==================== ADMIN ====================
+function switchAdminTab(el, tabId) {
+    el.parentElement.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    document.querySelectorAll('#page-admin .tab-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('admin-' + tabId).classList.add('active');
+}
+
+function renderUsersTable() {
+    const tbody = document.getElementById('usersTable');
+    tbody.innerHTML = usersData.map(u => `
+        <tr>
+            <td><strong>${u.name}</strong></td>
+            <td>${u.email}</td>
+            <td><span style="background:var(--active-nav-bg);color:var(--active-nav-text);padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">${u.role}</span></td>
+            <td>${getStatusBadge(u.status === 'active' ? 'active' : 'ended')}</td>
+            <td class="text-secondary">${u.lastActive}</td>
+            <td>
+                <div class="row-actions" style="opacity:1;">
+                    <button class="row-action-btn" onclick="handleEditUser('${u.email}')">Edit</button>
+                    ${u.role !== 'Admin' ? `<button class="row-action-btn" style="color:var(--red);" onclick="handleRemoveUser('${u.email}')">Remove</button>` : ''}
+                </div>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function renderActivityLogs() {
+    const container = document.getElementById('activityLogs');
+    container.innerHTML = activityLogsData.map(log => `
+        <div class="log-entry" data-action="${log.action}">
+            <div class="log-time">${log.time}</div>
+            <div class="log-content">
+                <div class="log-user">${log.user}</div>
+                <div class="log-action">${log.detail}</div>
+            </div>
+            <div class="log-ip">${log.ip}</div>
+        </div>
+    `).join('');
+}
+
+function filterLogs() {
+    const search = document.getElementById('logSearch').value.toLowerCase();
+    const filter = document.querySelector('#admin-activity .select-dropdown')?.value || 'all';
+
+    document.querySelectorAll('.log-entry').forEach(entry => {
+        const text = entry.textContent.toLowerCase();
+        const action = entry.dataset.action;
+        const matchSearch = text.includes(search);
+        const matchFilter = filter === 'all' || action === filter;
+        entry.style.display = matchSearch && matchFilter ? '' : 'none';
+    });
+}
+
+// ==================== UTILITIES ====================
+// Close modal on overlay click
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('modal-overlay') && e.target.classList.contains('active')) {
+        e.target.classList.remove('active');
+    }
+});
+
+// Close notif panel on outside click
+document.addEventListener('click', function(e) {
+    const panel = document.getElementById('notifPanel');
+    const bell = e.target.closest('.icon-btn');
+    if (panel.classList.contains('open') && !panel.contains(e.target) && (!bell || !bell.querySelector('[data-lucide="bell"]'))) {
+        panel.classList.remove('open');
+    }
+});
+
+// ==================== NEW ACTION HANDLERS ====================
+function handleForgotPassword() {
+    const email = prompt("Enter your email to receive a password reset link:");
+    if (email) showToast("Password reset link sent to " + email, "success");
+}
+
+function handleAccountSwitch() {
+    const acc = prompt("Enter the name of the account to switch to:");
+    if (acc && acc.trim() !== '') {
+        document.getElementById('userAvatar').textContent = acc.substring(0, 2).toUpperCase();
+        showToast("Switched to account: " + acc, "success");
+    }
+}
+
+function handleFilters() {
+    const filter = prompt("Enter filter criteria (e.g., 'Status=Active'):");
+    if (filter) showToast("Filter '" + filter + "' applied successfully", "success");
+}
+
+function handleCreateCampaign() {
+    const name = prompt("Enter Campaign Name:");
+    if (name && name.trim() !== '') {
+        const newCamp = {
+            id: Date.now(),
+            name: name,
+            delivery: 'paused',
+            budget: 1000,
+            spent: 0,
+            results: '0',
+            reach: 0,
+            impressions: 0,
+            cpr: null,
+            ctr: '0.0',
+            cpc: '0.00',
+            adSets: ['Default Ad Set']
+        };
+        campaignsData.unshift(newCamp);
+        renderCampaignsTable();
+        showToast("Campaign '" + name + "' created!", "success");
+    }
+}
+
+function handleUploadDialog() {
+    const url = prompt("Enter media URL to upload, or leave blank for a dummy upload:");
+    if (url !== null) {
+        showToast("Media uploaded successfully!", "success");
+    }
+}
+
+function handleEditLimit() {
+    const limit = prompt("Enter new account spending limit in INR:");
+    if (limit && !isNaN(limit)) {
+        const limitDisplay = document.querySelector('#page-billing .card span:nth-child(2)');
+        if (limitDisplay) {
+            limitDisplay.textContent = "/ INR " + parseInt(limit).toLocaleString('en-IN');
+            showToast("Spending limit updated to INR " + parseInt(limit).toLocaleString('en-IN'), "success");
+        }
+    }
+}
+
+function handleAddPaymentMethod() {
+    const card = prompt("Enter 16-digit card number:");
+    if (card && card.length >= 4) {
+        const last4 = card.slice(-4);
+        const html = `
+        <div class="settings-row">
+            <div style="display:flex;align-items:center;gap:12px;">
+                <div style="width:40px;height:28px;background:linear-gradient(135deg,#333,#000);border-radius:4px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:700;">CARD</div>
+                <div>
+                    <div class="settings-label">Card ending in ${last4}</div>
+                    <div class="settings-desc">Added just now</div>
+                </div>
+            </div>
+            <button class="row-action-btn" onclick="handleEditCard(this)">Edit</button>
+        </div>`;
+        document.getElementById('paymentMethods').insertAdjacentHTML('beforeend', html);
+        showToast("Payment method added!", "success");
+    }
+}
+
+function handleEditCard(btn) {
+    if (confirm("Do you want to remove this payment method?")) {
+        btn.closest('.settings-row').remove();
+        showToast("Payment method removed", "success");
+    }
+}
+
+function handleEditCampaign(id) {
+    const camp = campaignsData.find(c => c.id === id);
+    if (camp) {
+        const budget = prompt("Enter new daily budget (INR) for '" + camp.name + "':", camp.budget);
+        if (budget && !isNaN(budget)) {
+            camp.budget = parseInt(budget);
+            renderCampaignsTable();
+            showToast("Campaign budget updated!", "success");
+        }
+    }
+}
+
+function handlePreviewCampaign(name) {
+    alert("Preview mode activated for Campaign: " + name + "\\n\\n(This would normally show a preview panel)");
+}
+
+function handleDuplicateCampaign(id) {
+    const camp = campaignsData.find(c => c.id === id);
+    if (camp) {
+        const dup = JSON.parse(JSON.stringify(camp));
+        dup.id = Date.now();
+        dup.name = camp.name + " (Copy)";
+        dup.delivery = 'paused';
+        dup.spent = 0;
+        campaignsData.unshift(dup);
+        renderCampaignsTable();
+        showToast("Campaign duplicated successfully", "success");
+    }
+}
+
+function handleEditUser(email) {
+    const user = usersData.find(u => u.email === email);
+    if (user) {
+        const role = prompt("Enter new role for " + user.name + " (Admin/Analyst/Viewer):", user.role);
+        if (role) {
+            user.role = role.charAt(0).toUpperCase() + role.slice(1);
+            renderUsersTable();
+            showToast("User role updated!", "success");
+        }
+    }
+}
+
+function handleRemoveUser(email) {
+    if (confirm("Are you sure you want to remove user " + email + "?")) {
+        const idx = usersData.findIndex(u => u.email === email);
+        if (idx !== -1) {
+            usersData.splice(idx, 1);
+            renderUsersTable();
+            showToast("User removed successfully", "success");
+        }
+    }
+}
+
+// 4. Scroll listener with requestAnimationFrame throttle
+let ticking = false;
+window.addEventListener('scroll', () => {
+  if (!ticking) {
+    requestAnimationFrame(() => {
+      // scroll logic here
+      ticking = false;
+    });
+    ticking = true;
+  }
+});
+
+// 5. IntersectionObserver with early trigger rootMargin
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, {
+  rootMargin: '0px 0px -10% 0px',
+  threshold: 0
+});
+
+document.querySelectorAll('[data-animate]').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>

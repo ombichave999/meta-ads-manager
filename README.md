@@ -1,47 +1,74 @@
-# Meta Ads Manager Replica (Delta Crypto Exchange Edition)
+# 📊 Meta Ads Manager Replica (Delta Edition)
 
-A high-fidelity replica dashboard designed to emulate the standard Meta Ads Manager interface. It features interactive KPIs, performance analytics charts, campaign data management, creative ad preview mockups, invoice generation/export, and secure administrative controls.
-
-## 🚀 Key Features
-
-*   **KPI Performance Metrics:** Track Spent Amount, Impressions, Clicks, CTR, CPC, Leads, CPL, and Reach.
-*   **Ad Account Switcher & Date Filters:** Easily filter analytics data dynamically.
-*   **Three-Tab Ads Management Hierarchy:** Interactive campaigns tables for full configuration tracking.
-*   **Administrative Panel:** User role controls, active system activity logs, and settings parameters.
-*   **Invoice & Receipt Generator:** Capture and export payment invoices as PNG images directly from the dashboard.
-*   **Anti-DevTools Security Features:** Integrates local context menu locks and developer console shortcut blockages.
+<div align="center">
+  <img src="https://img.shields.io/badge/Status-Active-success?style=for-the-badge&logo=meta&logoColor=white&color=0071E3" alt="Status Active" />
+  <img src="https://img.shields.io/badge/Platform-Facebook%20Ads-1877F2?style=for-the-badge&logo=facebook&logoColor=white" alt="Platform" />
+  <img src="https://img.shields.io/badge/Target-Delta%20Exchange-0A84FF?style=for-the-badge&logo=crypto&logoColor=white" alt="Target" />
+</div>
 
 ---
 
-## 🔒 Authentication & Account Details
-
-To log in as an administrator, use the following pre-configured credentials:
-
-### Administrator Accounts
-1.  **Sanjev Marketing**
-    *   **Email:** `sanjevmarketing@gmail.com`
-    *   **Password:** `sanjev@11`
-2.  **Aditya Jangam**
-    *   **Email:** `adityajangam@2124`
-    *   **Password:** `Aditya@2111`
+A high-fidelity, interactive replica of the real **Meta Ads Manager** dashboard. Custom-built to manage, track, and showcase campaign performance analytics for **Delta Crypto Exchange** lead generation.
 
 ---
 
-## 📊 Campaign Targeting Profile (Active)
+## ✨ Features at a Glance
 
-The primary active campaign simulates targeting for Delta Crypto Exchange lead generation:
+```mermaid
+graph TD
+    A[User Session] -->|Authentication| B[Role Validation]
+    B -->|Admin Role| C[Access Billing & Admin Control]
+    B -->|User Role| D[Read-Only Campaigns Analytics]
+    C -->|Invoice Generator| E[Export PNG Receipt]
+    C -->|Activity Monitor| F[Audit Trail Logs]
+```
 
-*   **Campaign Name:** USDT Seller Lead Generation
-*   **Ad Set:** Crypto & Trading Interest Audience
-*   **Daily Budget:** ₹70,000 INR
-*   **Results Metric:** Leads Captured (42 leads)
-*   **Ad Placement Formats:** Facebook Mobile Feed & Instagram Stories
+### 📈 Core Modules
+*   **KPI Performance Grid:** Real-time metrics tracking Spent Amount, Impressions, Clicks, CTR, CPC, Leads, CPL, and Reach.
+*   **Dynamic Data Filtering:** Easily switch between campaigns and apply custom calendar date ranges.
+*   **Three-Level Ad Hierarchy View:** Toggle tabs to view configurations for Campaigns, Ad Sets, and Ads.
+*   **Invoice & Receipt Generator:** Capture payments and export professional PNG invoices directly from the web interface.
+*   **Admin Audit Logging:** Comprehensive administrative console showing active logins, activity metrics, and system IPs.
+*   **Anti-DevTools Shield:** Built-in scripts to discourage unauthorized console inspections.
 
 ---
 
-## 📁 Repository Structure
+## 🔒 Pre-Configured Administrator Credentials
 
-*   `index.html` — The main dashboard application file housing layout styles, data logic, and JavaScript charts.
-*   `assets/` — Local directory containing target imagery and creative assets (`suv.png`, `bridal.png`, `luxury.png`, `dining.png`, `usdt.png`).
-*   `META.html` — Mirror reference structure file.
-*   `index 2.html` — Historical sandbox variation backup.
+Access the administrative functions of the dashboard using these credentials:
+
+| Administrator | Email | Password | Role |
+| :--- | :--- | :--- | :--- |
+| **Sanjev Marketing** | `sanjevmarketing@gmail.com` | `sanjev@11` | `Admin` |
+| **Aditya Jangam** | `adityajangam@2124` | `Aditya@2111` | `Admin` |
+
+---
+
+## 🎯 Active Campaign Profile
+
+Our primary running promotion focuses on capturing high-intent USDT buyers:
+
+*   **Campaign Name:** `USDT Seller Lead Generation`
+*   **Targeting Audience:** `Crypto & Trading Interest Audience`
+*   **Daily Budget Limit:** `₹70,000 INR`
+*   **Current Results:** `42 Leads Captured`
+*   **Average CPL:** `₹357.14 INR`
+*   **Impressions:** `111,450`
+
+---
+
+## 📂 Repository Layout
+
+```bash
+├── assets/                  # High-quality creative ad images (suv.png, luxury.png, etc.)
+├── index.html               # Main dashboard source code (HTML, custom CSS, JS)
+├── META.html                # Backup reference template
+└── README.md                # Project documentation and specifications
+```
+
+---
+
+## 💻 Tech Stack & Customizations
+*   **Frontend Logic:** Vanilla Javascript with reactive data bindings.
+*   **Data Charts:** Interactive line/bar renderings using [Chart.js](https://www.chartjs.org/).
+*   **Visual Assets:** Dynamic icons provided by [Lucide Icons](https://lucide.dev/).
